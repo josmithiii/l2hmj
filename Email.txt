@@ -1,0 +1,27 @@
+To: <latex2html@tug.org>
+Cc: 647433@bugs.debian.org
+Subject: [l2h] New release of latex2html? 
+
+Hi,
+
+at Debian, we found that there is
+
+http://mirrors.ctan.org/support/latex2html/latex2html-2012.tgz
+
+which wasn't announced as an official new release. See also
+
+http://bugs.debian.org/647433
+
+Now I wonder if I should use this as the new official "upstream" version
+to be built upon from now on? There are some doubts that I collected in
+the above Debian bug report.
+
+Any remarks?
+
+Thanks in advance,
+
+Roland
+_______________________________________________
+latex2html mailing list
+latex2html@tug.org
+http://tug.org/mailman/listinfo/latex2html 
