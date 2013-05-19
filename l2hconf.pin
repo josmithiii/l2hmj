@@ -157,8 +157,9 @@ $DVIPSOPT = '@DVIPSOPT@';
 # complicated image include commands like \includegraphics, this option
 # will speed up image generation a *lot*.
 #
- $DVIPSOPT .= " -E";
-
+# $DVIPSOPT .= " -E";
+#
+# NOTE: This option is added automatically by configure (see ./config/config.pl)
 
 # (Note: this here is old, don't worry unless you really run into trouble.)
 #
@@ -176,7 +177,9 @@ $DVIPSOPT = '@DVIPSOPT@';
 # TeX installation; e.g. " -Pcmz -Pams"  or " -Ppdf" 
 #
 # $DVIPSOPT .= " -Ppdf";
-
+#
+# Note: -Ppdf pulls in alt-rule.pro which may result in black rules under equations.
+# Use with caution.
 
 # For efficient use of font resources, minimising disk-space use,
 # allow GhostScript to find the fonts it needs for images.

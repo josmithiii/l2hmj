@@ -84,6 +84,7 @@
 #  bv = Boris Veytsman <boris@plmsc.psu.edu>
 #  kr = Keith Refson <Keith.Refson@earth.ox.ac.uk>
 #  uw = Uli Wortmann <uli12@bonk.ethz.ch>
+# jos = Julius Smith <jos@ccrma.stanford.edu>
 #
 #
 #------------------- Test Suite Manifest ----------------------------------
@@ -112,6 +113,22 @@
 # A more detailed log history can be found within the particular files, near
 # the top.
 #
+#--------- 2013/5
+#
+#       jos   prefs.pm:
+#               - removed -Ppdf option from $DVIPSOPT because it
+#                 results in alt-rule.pro being loaded by dvips, which results in
+#                 black bars under equations.
+#             latex2html.pin:
+#               - fixed unequal parens bug in small-caps 
+#               - fixed left-aligned address bug (under centered title and author)
+#             pstoimg.pin:
+#               - fixed grey-background in images bug caused by incorrect search
+#                 for "TeXcolorgray" in PS files by pstoimg
+#             All changes can be found by searching for "jos:" in source.
+#             All of the above bugfixes were reported to latex2html mailing list
+#             and various bugzilla posts years ago, some repeatedly, but no action 
+#             was ever taken on any of them, hence this forklet based on v2002-2-1.
 #
 #--------- 2012/11
 #

@@ -175,7 +175,7 @@ use strict;
 # use diagnostics;
 use vars qw(%cfg);
 
-my ($VERSION) = q$Revision: 1.12 $ =~ /:\s*(\S*)/;
+my ($VERSION) = q$Revision: 0.1 $ =~ /:\s*(\S*)/;
 
 # --------------------------------------------------------------------------
 # Initialize
@@ -444,7 +444,7 @@ sub install_recurse {
   my @subdirs = ();
   my $item;
   while(defined($item = readdir(DIR))) {
-    next if($item =~ /^(\.{1,2}|CVS)$/);
+    next if($item =~ /^(\.{1,2}|CVS|\.git)$/);
     my $full = "$dir/$item";
     if(-d $full) {
       push(@subdirs,$full);

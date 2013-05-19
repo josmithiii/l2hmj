@@ -7,7 +7,7 @@
 #- The traditional #! line will be inserted automatically
 #-
 ##############################################################################
-# $Id: pstoimg.pin,v 1.19 2004/01/02 08:20:33 RRM Exp $
+# Old version line: $Id: pstoimg.pin,v 1.19 2004/01/02 08:20:33 RRM Exp $
 #
 # pstoimg
 #
@@ -22,6 +22,15 @@
 ##############################################################################
 #
 # $Log: pstoimg.pin,v $
+#
+#
+my $REVISION = "2013/05/08";
+#
+# Revision  2013/05/18  jos
+#  --  Disable $have_geometry so gs won't produce a blank .pnm file (search for 'jos:')
+#      FIXME: THIS IS JUST A WORKAROUND - NEED TO REVERT THIS AND DEBUG GS OPTIONS
+#  --  Deleted '\n' before first '\d+' in $had_nonwhite test (search for 'jos:')
+#
 # Revision 1.19  2004/01/02 08:20:33  RRM
 #  --  support  -interlace (as identical to  -interlaced) so as not to
 #      run afoul when  $POSIXLY_CORRECT  is set.
@@ -272,7 +281,7 @@ BEGIN {
 use L2hos; # load OS-specific stuff
 
 my $RELEASE = '@distver@';
-my ($VERSION) = q$Revision: 1.19 $ =~ /:\s*(\S+)/;
+my ($VERSION) = "Revision: $REVISION";
 
 $| = 1; # unbuffer STDOUT
 
@@ -1073,7 +1082,7 @@ sub ps2pnm {
           $bbw = int($bbw + 0.99);
           $bbh = int($bbh + 0.99);
           $GEOMETRY = "${bbw}x${bbh}";
-          $have_geometry = 1;
+#jos:          $have_geometry = 1;
           last;
           }
         }
@@ -1113,7 +1122,7 @@ sub ps2pnm {
     $bbw += 10;  # add a 5pt margin for safety
     $bbh += 40;  # add a 20pt margin for safety
     $GEOMETRY = "${bbw}x$bbh";
-    $have_geometry = 1;
+#jos:    $have_geometry = 1;
     }
   if($have_geometry) {
 #if @have_geometry@
@@ -1137,7 +1146,9 @@ sub ps2pnm {
       }
     my $had_nonwhite;
     if($opt{white}) {
-      $had_nonwhite = ($ps =~ s/(\n\d+ \d+ bop gsave) \d*\.\d+ (TeXcolorgray clippath fill grestore)/$1 1 $2/s);
+      #jos: Deleted '\n' before first '\d+' because fill can now be anywhere in line:
+      $had_nonwhite = ($ps =~ s/(\d+ \d+ bop gsave) \d*\.\d+ (TeXcolorgray clippath fill grestore)/$1 1 $2/s);
+#     $had_nonwhite = ($ps =~ s/(\n\d+ \d+ bop gsave) \d*\.\d+ (TeXcolorgray clippath fill grestore)/$1 1 $2/s);
       }
     $ps_changed = $had_papersize || $had_nonwhite;
     if($ps_changed) {
