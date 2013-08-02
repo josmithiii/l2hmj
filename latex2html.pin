@@ -3218,6 +3218,7 @@ sub special_env {
 # Only letters should become italic; symbols should stay non-italic.
 sub simple_math_env {
     local($mathcontents) = @_;
+    print STDOUT "simple_math_env:mathcontents = '$mathcontents'\n" if ($VERBOSITY > 4); # jos
     if ($mathcontents eq '') { return("$mathcontents"); }
     elsif ($NO_SIMPLE_MATH) {  # always make an image
 	$failed = 1; return($mathcontents);

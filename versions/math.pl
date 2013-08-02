@@ -43,7 +43,6 @@ $mathend_mark = "\n${verbatim_mark}mathend000#";
 $keepcomments_rx = "\\s*(picture|makeimage|xy|diagram|mathend)[*]?"
   unless ($keepcomments_rx =~ /mathend/);
 
-
 sub do_env_math {
     local($_) = @_;
     local($math_mode, $failed, $labels, $comment,$img_params) = ("inline",'','');

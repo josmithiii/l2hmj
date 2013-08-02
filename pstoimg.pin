@@ -23,8 +23,11 @@
 #
 # $Log: pstoimg.pin,v $
 #
-#
 my $REVISION = "2013/05/08";
+#
+# Revision 2013/07/31  JOS
+#  -- Search for bounding box in .ps files as well as .epsf files (need on Mac OS X)
+#  -- Refuse to install when a possibly shadowing version exists in /opt/local/bin/
 #
 # Revision  2013/05/18  jos
 #  --  Disable $have_geometry so gs won't produce a blank .pnm file (search for 'jos:')
@@ -1062,7 +1065,9 @@ sub ps2pnm {
     # we're in a EPSF file
     $epsf = 1;
     }
-  if($GEOMETRY || $epsf) {
+#jos:  if($GEOMETRY || $epsf) {
+#jos: look for bounding box even in a .ps file (needed on Mac OS X):
+    if(1) {
     while (defined ($_ = <PS>)) {
       # Look for bounding box comment
       # MRO: add support of precise bounding boxes

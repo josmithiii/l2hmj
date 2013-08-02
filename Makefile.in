@@ -129,7 +129,16 @@ check: all
 	exit 0
 
 install: all
-	${PERL} ${installcmd}
+install: all
+	for file in ${SCRIPTS}; do \
+	  if test -f /opt/local/bin/$$file; then \
+	    echo "*** FIRST REMOVE MacPorts package latex2html by saying"; \
+	    echo "    sudo port uninstall latex2html"; \
+	    exit 1; \
+	  fi ; \
+	done ; \
+	${PERL} ${installcmd}; \
+	exit 0
 
 # Don't cd, to avoid breaking install-sh references.
 

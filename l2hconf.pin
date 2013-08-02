@@ -593,14 +593,15 @@ $DEBUG = 0;
 # -html_version
 # The default HTML version to be produced
 #
-$HTML_VERSION = '3.2';
-
+#jos: $HTML_VERSION = '3.2';  # really old by now
+# $HTML_VERSION = '4.0,math'; # Has a problem: "mathend000#" not removed
+$HTML_VERSION = '4.0'; # seems to be ok
 
 # -no_math
-# By default the special MATH extensions are not used
-# since they do not conform with the HTML 3.2 standard.
+# Note that the special MATH extensions do not conform with the HTML 3.2 standard.
 #
-$NO_SIMPLE_MATH = 1;
+#jos: $NO_SIMPLE_MATH = 1;
+$NO_SIMPLE_MATH = 0;
 
 
 # -unsegment
