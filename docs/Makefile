@@ -17,7 +17,8 @@
 # These are the usual calls to application programs
 #
 DVIPS = dvips
-LATEX = latex
+#LATEX = latex
+LATEX = latex -file-line-error -recorder
 MAKEINDEX = makeindex
 BIBTEX = bibtex
 

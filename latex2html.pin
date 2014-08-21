@@ -150,7 +150,6 @@ $TEX2HTMLV_SHORT = $RELEASE;
 $TEX2HTMLVERSION = "$TEX2HTMLV_SHORT ($REVISION)";
 $TEX2HTMLADDRESS = "http://www.latex2html.org/";
 $AUTHORADDRESS = "http://cbl.leeds.ac.uk/nikos/personal.html";
-#$AUTHORADDRESS2 = "http://www-math.mpce.mq.edu.au/%7Eross/";
 $AUTHORADDRESS2 = "http://www.maths.mq.edu.au/&#126;ross/";
 
 # Set $HOME to what the system considers the home directory
@@ -3980,13 +3979,15 @@ sub make_images {
 	}
 	print STDOUT " *** image done ***\n" if ($VERBOSITY > 2);
     }
-    if ($new_page_num > 999) {
-	die "*** latex2html error: AT MOST 999 IMAGES SUPPORTED in this mode ***\n"
-    }
+#jos:    if ($new_page_num > 999) {
+#jos:	die "*** latex2html error: AT MOST 999 IMAGES SUPPORTED in this mode ***\n"
+#jos:    }
     &write_warnings(
 		    "\nOne of the images is more than one page long.\n".
 		    "This may cause the rest of the images to get out of sync.\n\n")
 	if (-f sprintf("%s%.3d%s", $IMAGE_PREFIX, ++$new_page_num, ".ps"));
+#jos: dvips cannot do anything but three digits:
+#	if (-f sprintf("%s%.4d%s", $IMAGE_PREFIX, ++$new_page_num, ".ps"));
     print "\n *** no more images ***\n"  if ($VERBOSITY > 1);
     # MRO: The following cleanup seems to be incorrect: The DBM is
     # still open at this stage, this causes a lot of unlink errors
@@ -4078,7 +4079,7 @@ sub process_log_file {
 sub extract_image { # clean
     my ($page_num,$name) = @_;
 
-    # The followin come out of %img_params
+    # The following come out of %img_params
     my ($scale, $external, $thumbnail, $map, $psimage, $align, $usemap,
 	  $flip, $aalias, $trans, $exscale, $alt, $exstr);
 
@@ -4093,6 +4094,8 @@ sub extract_image { # clean
     my ($env,$basename,$img) = ($name,"img$global_num",'');
     $env =~ s/\d+$//;
     $psname = sprintf("%s%.3d", "$TMPDIR$dd$IMAGE_PREFIX", $new_num);
+#jos: dvips cannot do anything but three digits:
+#    $psname = sprintf("%s%.4d", "$TMPDIR$dd$IMAGE_PREFIX", $new_num);
     if ( $EXTERNAL_IMAGES && $PS_IMAGES ) {
 	$img =  "$basename.ps";
 	L2hos->Copy("$psname.ps", "${PREFIX}$img");
@@ -4303,10 +4306,13 @@ sub extract_parameters {
     local($keep_gt)=1;
     $alt = &flatten_math($contents); undef $keep_gt;
     #RRM: too long strings upset the DBM. Truncate to <= 165 chars.
-    if ( length($alt) > 163 ) {
-	local($start,$end);
-	$start = substr($alt,0,80);
-	$end = substr($alt,length($alt)-80,80);
+    #JOS: let's fix the DBM. Complete ALT strings needed for blind readers.
+    # Default can be $ALTMAXLENGTH = 165
+    if ( $ALTMAXLENGTH && length($alt) > $ALTMAXLENGTH-2 ) {
+	local($start,$end,$halflen);
+	$halflen = ($ALTMAXLENGTH>>1) - 3;
+	$start = substr($alt,0,$halflen);
+	$end = substr($alt,length($alt)-$halflen,$halflen);
 	$alt = join('',$start,"...\n ...",$end);
     }
     s/ALT\s*=\"([\w\W]*)\"/$alt=$1;''/ie;

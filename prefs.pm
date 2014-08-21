@@ -215,9 +215,10 @@ $prefs{'DVIPS'} = 'dvips,dvi2ps,dvips32';
 # Many options can be used with dvips to produce better quality images
 # or speed-up other aspects of image-generation.
 # $prefs{'DVIPSOPT'} = ' -E';  # create encapsulated (EPS) images
+# jos: At one time I had to disable -E due to clipped images, but it seems ok now.
 # $prefs{'DVIPSOPT'} = ' -Ppdf'; # use Type 1 fonts, as for PDF
+# jos: -Ppdf pulls in alt-rule.pro which results in black bars under equations:
 # $prefs{'DVIPSOPT'} = ' -Pcmz -Pamz'; # use CM and AMS Type 1 fonts
-$prefs{'DVIPSOPT'} = ' -Ppdf';
 
 # set this to 1 if you want dvips to create special fonts for better
 # image generation. You need to set the following two items to correct

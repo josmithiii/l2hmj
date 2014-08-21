@@ -129,7 +129,6 @@ check: all
 	exit 0
 
 install: all
-install: all
 	for file in ${SCRIPTS}; do \
 	  if test -f /opt/local/bin/$$file; then \
 	    echo "*** FIRST REMOVE MacPorts package latex2html by saying"; \
@@ -152,11 +151,11 @@ Makefile: Makefile.in config.status
 config.status: ${srcdir}/configure config/config.pl
 	./config.status --recheck
 
-clean mostlyclean distclean:: test_clean
+clean mostlyclean distclean::
 	rm -f ${SCRIPTS} ${MODULES} *.tmp *.bak *.pl
 	rm -fr bin
 
-distclean::
+distclean:: test_clean
 	rm -f Makefile config.status config.cache config.log ${cfgfile}
 	rm -f test.bat install.bat
 

@@ -1431,6 +1431,7 @@ sub translate_math_commands {
 	    while ($pre_test =~ s/(($O|$OP)\d+($C|$CP))(.*)\1/$4/) {};
 	    $use_all = 1 if ($pre_test=~s/($O|$OP)\d+($C|$CP)//);
 	    if (!$use_all) {
+                $pre_test = $pre_text; # Shigeharu TAKENO <shige@iee.niit.ac.jp> 8/21/2014
 	        while ($pre_test =~ s/\\begin(($O|$OP)\d+($C|$CP))(.*)\\end\1/$4/){};
 		$use_all = 1 if ($pre_test=~s/\\(begin|end)($O|$OP)\d+($C|$CP)//);
 	    };
