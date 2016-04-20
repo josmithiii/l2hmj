@@ -236,7 +236,9 @@ sub do_cmd_htmladdnormallink{
     $url = &missing_braces unless
 	((s/$next_pair_pr_rx/$url = $2; ''/eo)
 	||(s/$next_pair_rx/$url = $2; ''/eo));
-    $*=1; s/^\s+/\n/; $*=0;
+#JOS: $*=1;
+s/^\s+/\n/m;
+#JOS: $*=0;
     if ($name) { $href = &make_named_href($name,$url,$text) }
     else { $href = &make_href($url,$text) }
     print "\nHREF:$href" if ($VERBOSITY > 3);

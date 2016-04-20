@@ -458,7 +458,7 @@ sub get_eqn_number {
 		, $EQNO_END);
 	}
     } else { $tag = ';SPMnbsp;' }
-    $*=0;
+#JOS: $*=0;
     if ($labels) {
 	$labels =~ s/$anchor_mark/$tag/o;
 	($labels , $scan);

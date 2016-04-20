@@ -94,7 +94,7 @@ sub get_eqn_number {
 		, $EQNO_END);
 	}
     } else { $tag = ';SPMnbsp;;SPMnbsp;;SPMnbsp;' }
-    $*=0;
+#JOS: $*=0;
     if ($labels) {
 	$labels =~ s/$anchor_mark/$tag/o;
 	($labels , $scan);
@@ -285,7 +285,9 @@ sub process_env_equation {
 	    } else { $return .= join('', $mspace , $ecell, $erow); } 
 	} else {
 	    $thismath = $_;
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+#JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+#JOS: $*=0;
 	    if (($doimage)||($failed)) {
 	        $thismath = &process_math_in_latex("indisplay",'',''
 		    , $doimage.$thismath ) unless ($thismath eq '' );
@@ -430,7 +432,9 @@ sub process_env_multline {
 
 	    # columns to be set using \displaystyle
 	    $thismath = $_; 
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+#JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+#JOS: $*=0;
 	    if (($doimage)||($failed)) {
 	        $thismath = &process_math_in_latex("indisplay",'',''
 		    , $doimage.$thismath ) unless ($thismath eq '' );
@@ -767,7 +771,9 @@ sub process_env_align{
 		# alternating right/left aligned
 		$scell =  (($scell eq $slcell)? $srcell : $slcell) if ($col_cnt);
 		$thismath = $_; $col_cnt++;
-		$* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+#JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+#JOS: $*=0;
 		if (($doimage)||($failed)) {
 		    $thismath = &process_math_in_latex("indisplay",'',''
 	 		, $doimage.$thismath ) unless ($thismath eq '' );
@@ -923,7 +929,9 @@ sub do_env_split {
 	    @cols = split(/$mdlim/o);
 	    # left column, set using \displaystyle
 	    $thismath = shift(@cols); 
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+#JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+#JOS: $*=0;
 	    if (($doimage)||($failed)) {
 	        $thismath = &process_math_in_latex("indisplay",'',''
 		    , $doimage.$thismath ) unless ($thismath eq '' );
@@ -940,7 +948,9 @@ sub do_env_split {
 
 	    # right column, set using \displaystyle
 	    $thismath = shift(@cols);
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+#JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+#JOS: $*=0;
 	    if (($doimage)||($failed)) {
 		$thismath = &process_math_in_latex("indisplay",'',''
 		    , $doimage.$thismath ) unless ($thismath eq '' );

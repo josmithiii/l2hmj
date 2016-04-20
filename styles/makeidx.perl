@@ -189,7 +189,9 @@ sub named_index_entry {
     # ! -> \001
     # @ -> \002
     # | -> \003
-    $* = 1; $str =~ s/\n\s*/ /g; $* = 0; # remove any newlines
+#JOS: $* = 1;
+$str =~ s/\n\s*/ /mg; # remove any newlines
+#JOS: $* = 0;
     # protect \001 occurring with images
     $str =~ s/\001/\016/g;
 

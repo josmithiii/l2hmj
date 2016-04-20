@@ -1258,9 +1258,9 @@ sub do_env_eqnarray {
 #	    if (s/\\lefteqn$OP(\d+)$CP(.*)$OP\1$CP/ $2 /) {
 	    if (s/\\lefteqn//) {
 		$return .= "\"LEFT\" COLSPAN=\"3\">";
-$JOS: $* =1;
+#JOS: $* =1;
 s/(^\s*|$html_specials{'&'}|\s*$)//mg;
-$JOS: $*=0;
+#JOS: $*=0;
 		if (($NO_SIMPLE_MATH)||($doimage)||($failed)) {
 		    $_ = (($_)? &process_math_in_latex(
 		        "indisplay" , '', '', $doimage.$_ ):'');
@@ -1285,9 +1285,9 @@ $JOS: $*=0;
 
 	    # left column, set using \displaystyle
 	    $thismath = shift(@cols); $failed = 0;
-$JOS: $* =1;
+#JOS: $* =1;
 $thismath =~ s/(^\s*|\s*$)//mg;
-JOS: $*=0;
+#JOS: $*=0;
 	    if (($NO_SIMPLE_MATH)||($doimage)||($failed)) {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , '', '', $doimage.$thismath ):'');

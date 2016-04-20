@@ -145,7 +145,7 @@ $BKGSTRING = "bgcolor";
 sub read_rgb_colors {
     local($base_file) = @_;
     local($file) = $base_file;
-    local($prev) = $*;
+#JOS:    local($prev) = $*;
     local($r,$g,$b,$name,$dir);
     foreach $dir (split(/$envkey/,$LATEX2HTMLSTYLES)) {
     	$file = "$dir$dd$base_file"
@@ -154,7 +154,7 @@ sub read_rgb_colors {
 	if (-f $file) {
             if (open(COLORFILE,"<$file")) {
 		print STDOUT "\n(reading colors from $file" if $DEBUG;
-		$* = 0;	# Multiline matching OFF
+#JOS:		$* = 0;	# Multiline matching OFF
 		while (<COLORFILE>) {
 	s/^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\w+(\s\w+)*)\s*/
 	    ($r,$g,$b,$name)=($1,$2,$3,$4);
@@ -170,14 +170,14 @@ sub read_rgb_colors {
 	    }
 	}
     }
-    $* = $prev;		# Restore Multiline matching
+#JOS:    $* = $prev;		# Restore Multiline matching
     $_[0];
 }
 
 sub read_cmyk_colors {
     local($base_file) = @_;
     local($file) = $base_file;
-    local($prev) = $*;
+#JOS:    local($prev) = $*;
     local($c,$m,$y,$k,$name,$dir,@colors);
     local($num_rx) = "(\\d|\\d\\.\\d*)";
     foreach $dir (split(/$envkey/,$LATEX2HTMLSTYLES)) {
@@ -187,7 +187,7 @@ sub read_cmyk_colors {
 	if (-f $file) {
 	    if (open(COLORFILE,"<$file")) {
 		print STDOUT "\n(reading colors from $file";
-		$* = 0;			# Multiline matching OFF
+#JOS:		$* = 0;			# Multiline matching OFF
 		@colors = (<COLORFILE>);
 		foreach (@colors) {
 		    next if (/^\s*$/);
@@ -211,7 +211,7 @@ sub read_cmyk_colors {
 	    }
 	} 
     }
-    $* = $prev;		# Restore Multiline matching
+#JOS:    $* = $prev;		# Restore Multiline matching
     $_[0];
 }
 
