@@ -406,9 +406,10 @@ sub translate_colspec {
 	    }
 	    $celldata .= ' ' if ($celldata =~ /\\\w+$/);
 
-	    $* = 1;    # multiline matching ON
-	    $celldata =~ s/$wrap_parbox_rx/$6/g;
-	    $* = 0;    # multiline matching OFF
+#JOS:	    $* = 1;    # multiline matching ON
+#JOS:	    $celldata =~ s/$wrap_parbox_rx/$6/g;
+	    $celldata =~ s/$wrap_parbox_rx/$6/mg;
+#JOS:	    $* = 0;    # multiline matching OFF
 #	    $at_text .= $celldata;
 #	    if ( $#colspec > -1) {
 #	        $colspec[$#colspec] .= join('', "<TD ALIGN=\"LEFT\">",$celldata,'</TD>');
@@ -434,9 +435,9 @@ sub translate_colspec {
 	    }
 	    $celldata .= ' ' if ($celldata =~ /\\\w+$/);
 
-	    $* = 1;    # multiline matching ON
-	    $celldata =~ s/$wrap_parbox_rx/$6/g;
-	    $* = 0;    # multiline matching OFF
+#JOS:	    $* = 1;    # multiline matching ON
+	    $celldata =~ s/$wrap_parbox_rx/$6/mg;
+#JOS:	    $* = 0;    # multiline matching OFF
 	    $at_text .= $celldata;
 
 	} elsif ( $char =~ /;|\&/ ) {
@@ -596,9 +597,9 @@ sub process_tabular {
 
     while (/\\parbox/) {
 	local($parlength) = length($_);
-	$* = 1;    # multiline matching ON
-	s/$wrap_parbox_rx/&convert_parbox_newlines($6)/eg;
-	$* = 0;    # multiline matching OFF
+#JOS:	$* = 1;    # multiline matching ON
+	s/$wrap_parbox_rx/&convert_parbox_newlines($6)/emg;
+#JOS:	$* = 0;    # multiline matching OFF
 
 	if ($parlength == length($_)) {
 	    print "\n*** \\parbox's remain in table!!\n";
@@ -823,9 +824,9 @@ sub process_tabular {
 		}
 		$colspec = &translate_environments("$OP$tmp$CP$colspec$OP$tmp$CP");
 		$colspec = &translate_commands($colspec);
-		$* = 1;
-		while ($colspec =~ s/<(\w+)>\s*<\/\1>//g) {};
-		$* = 0;
+#JOS:		$* = 1;
+		while ($colspec =~ s/<(\w+)>\s*<\/\1>//mg) {};
+#JOS:		$* = 0;
 		$colspec = ';SPMnbsp;' if ($colspec =~ /^\s*$/);
 		$colspec = join('', $reopens, $colspec
 		        , (@$open_tags_R ? &close_all_tags() : '')
@@ -966,7 +967,9 @@ sub make_math_comment{
 	$ecomm = "\n\\end{$env}";
     } unless ($env =~/tex2html/);
     $_ = &revert_to_raw_tex;
-    $* = 1; s/^\s+//s; s/\s+$//s; $* = 0;
+#JOS: $* = 1;
+    s/^\s+//sm; s/\s+$//sm;
+#JOS: $* = 0;
     $_ = $scomm . $_ . $ecomm;
     return() if (length($_) < 16);
     $global{'verbatim_counter'}++;
@@ -1057,20 +1060,20 @@ sub do_env_equation {
     local($seqno) = join('',"\n<TD$eqno_class WIDTH=10 ALIGN=\""
                          , (($EQN_TAGS =~ /L/)? 'LEFT': 'RIGHT')
 		         , "\">\n");
-    $* = 1;
+#JOS:  $* = 1;
     do { # get the equation number
 	$global{'eqn_number'}++;
 	$eqno = &translate_commands('\theequation');
-    } unless ((s/(\\nonumber|\\notag)//g)||(/\\tag/));
+    } unless ((s/(\\nonumber|\\notag)//mg)||(/\\tag/));
     if (/\\tag(\*)?/){
 	# AmS-TEX line-number tags.
 	if (defined  &get_eqn_number ) {
 	    ($eqno, $_) = &get_eqn_number(1,$_);
 	} else {
-	    s/\\tag(\*)?//;
+	    s/\\tag(\*)?//m;
 	    local($nobrack,$before) = ($1,$`);
 	    $_ = $';
-	    s/next_pair_pr_rx//o;
+	    s/next_pair_pr_rx//om;
 	    if ($nobrack) { $eqno = $2; }
 	    else { $eqno = join('',$EQNO_START, $2, $EQNO_END) };
 	    $_ = $before;
@@ -1078,7 +1081,7 @@ sub do_env_equation {
     } elsif ($eqno) {
 	$eqno = join('',$EQNO_START, $eqno, $EQNO_END)
     } else { $eqno = '&nbsp;' } # spacer, when no numbering
-    $* = 0;
+#JOS: $* = 0;
 
     # include the equation-number, using a <TABLE>
     local($halign) = $math_class unless $FLUSH_EQN;
@@ -1255,7 +1258,9 @@ sub do_env_eqnarray {
 #	    if (s/\\lefteqn$OP(\d+)$CP(.*)$OP\1$CP/ $2 /) {
 	    if (s/\\lefteqn//) {
 		$return .= "\"LEFT\" COLSPAN=\"3\">";
-		$* =1; s/(^\s*|$html_specials{'&'}|\s*$)//g; $*=0;
+$JOS: $* =1;
+s/(^\s*|$html_specials{'&'}|\s*$)//mg;
+$JOS: $*=0;
 		if (($NO_SIMPLE_MATH)||($doimage)||($failed)) {
 		    $_ = (($_)? &process_math_in_latex(
 		        "indisplay" , '', '', $doimage.$_ ):'');
@@ -1280,7 +1285,9 @@ sub do_env_eqnarray {
 
 	    # left column, set using \displaystyle
 	    $thismath = shift(@cols); $failed = 0;
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+$JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+JOS: $*=0;
 	    if (($NO_SIMPLE_MATH)||($doimage)||($failed)) {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , '', '', $doimage.$thismath ):'');
@@ -1300,7 +1307,9 @@ sub do_env_eqnarray {
 
 	    # center column, set using \textstyle
 	    $thismath = shift(@cols); $failed = 0;
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+#JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+#JOS: $*=0;
 	    if (($NO_SIMPLE_MATH)||($doimage)||($failed)) {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , 'text', '', $doimage.$thismath ):'');
@@ -1320,7 +1329,9 @@ sub do_env_eqnarray {
 
 	    # right column, set using \displaystyle
 	    $thismath = shift(@cols); $failed = 0;
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+#JOS: $* =1;
+$thismath =~ s/(^\s*|\s*$)//mg;
+#JOS: $*=0;
 	    if (($NO_SIMPLE_MATH)||($doimage)||($failed)) {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , '', '', $doimage.$thismath ):'');
