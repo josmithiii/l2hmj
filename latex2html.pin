@@ -1396,6 +1396,10 @@ sub pre_process {
     # This has to be here, because  they might contain
     # structuring commands like \section etc.
     local(%comments);
+
+    print "\n *** pre_process *** " if ($VERBOSITY > 1); # JOS
+#   print "\n *** pre_process: input = /$_/\n*** " if ($VERBOSITY > 1); # JOS
+
     &pre_pre_process if (defined &pre_pre_process);
     s/\\\\/\\\\ /go;		# Makes it unnecessary to look for escaped cmds
     &replace_html_special_chars;
@@ -1420,6 +1424,7 @@ sub pre_process {
 	s/%%% TEXEXPAND[^\n]*\n//gm;
     }
     # Move all LaTeX comments into a local list
+    print "\n *** move all LaTeX comments to local list *** " if ($VERBOSITY > 1); # JOS
     s/([ \t]*(^|\G|[^\\]))(%.*(\n[ \t]*|$))/print "%";
 	$comments{++$global{'verbatim_counter'}} = "$3";
 	&write_mydb("verbatim", $global{'verbatim_counter'}, $3);
@@ -1596,6 +1601,8 @@ sub pre_process {
 
     #JKR: the comments include the linebreak and the following whitespace
 #   s/([^\\]|^)(%.*\n[ \t]*)+/$1/gom; # Remove Comments but not % which may be meaningful
+#JOS-Experiment (no help): s/((^|\n)$comment_mark(\d+))+//go; # Remove comment markers on new lines, but *not* the trailing \n
+    print "\n *** removing comment markers but not trailing newline *** " if ($VERBOSITY > 1); # JOS
     s/((^|\n)$comment_mark(\d+))+//gom; # Remove comment markers on new lines, but *not* the trailing \n
     s/(\\\w+|(\W?))($comment_mark\d*\n?)/($2)? $2.$3:($1? $1.' ':'')/egm; # Remove comment markers, not after braces
 #    s/(\W?)($comment_mark\d*\n?)/($1)? $1.$2:''/egm; # Remove comment markers, not after braces
@@ -1639,6 +1646,8 @@ sub pre_process {
     s/\\html\s*($O\d+$C)(.*)\1/$2/sg;
     s/\\html\s*($O\d+$C)//gm;
 
+#   print "\n *** pre_process: result = /$_/\n*** " if ($VERBOSITY > 1); # JOS
+
 #    &make_unique($_);
 }
 
@@ -1648,6 +1657,7 @@ sub pre_process {
 sub protect_after_comments {
     my ($verb_text) = @_;
 #    $verb_text =~ s/\%(.*)/'%'.&protect_helper($1)/eg;
+    print "\n *** protect_after_comments *** " if ($VERBOSITY > 1); # JOS
     $verb_text =~ s/(^|[^\\])(\\\\)*\%(.*)/$1.$2.'%'.&protect_helper($3)/emg;
     $verb_text;
 }
@@ -1661,6 +1671,7 @@ sub protect_helper {
 
 sub make_comment {
     local($type,$_) = @_;
+    print "\n *** make_comment *** " if ($VERBOSITY > 1); # JOS
     $_ =~ s/\\(index|label)\s*(($O|$OP)\d+($C|$CP)).*\2//sg;
     $_ = &revert_to_raw_tex($_);  s/^\n+//m;
     $_ =~ s/\\(index|label)\s*\{.*\}//sg;
@@ -1838,8 +1849,10 @@ sub do_write_string_out {
     &pre_process;
     # locate the blank lines for \par s
     &substitute_pars;
+    #OK: print "\n *** do_write_string_out: result 2 = /$_/\n*** " if ($VERBOSITY > 1); # JOS
     # Handle newcommand, newenvironment, newcounter ...
     &substitute_meta_cmds;
+    #BUG! [fixed 5/14/2016]: print "\n *** do_write_string_out: result 3 = /$_/\n*** " if ($VERBOSITY > 1); # JOS
     &wrap_shorthand_environments;
     print STDOUT "\n *** End-of-partition ***" if ($VERBOSITY > 1);
     if(open(OUT, ">$TMP_$dd$PARTITION_PREFIX$count")) {
@@ -5129,7 +5142,8 @@ sub substitute_meta_cmds {
     $_ = join('',@processed, $after); undef @processed;
     if ($PREAMBLE) {
 	# MRO: replaced $* with /m
-        s/((\n$comment_mark\d*)+\n)//gm;
+#JOS: THIS WAS THE BUG!: s/((\n$comment_mark\d*)+\n)//gm;
+        s/((\n$comment_mark\d*)+(\n))/$3/gm;
         s/(\\par\b\s*\n?)+/\\par\n/gm;
         s/(\\par\b\n?)+/\\par\n/gm;
     }
@@ -6522,7 +6536,7 @@ sub parse_keyvalues {
     print "\nATTRIBS: $saved\n" if ($VERBOSITY > 6);
 
     $saved =~ s/$percent_mark/%/g;
-#JOS:    $saved =~ s/((^|[\s,=])')\\\W{(\w)}/$1$3/g
+#JOS: $saved =~ s/((^|[\s,=])')\\\W{(\w)}/$1$3/g
     $saved =~ s/((^|[\s,=])')\\\W\{(\w)}/$1$3/g
 	if $is_german;  #unwanted accents, from active "
     if (@tags) {
@@ -13855,6 +13869,8 @@ sub do_cmd_label {
     $label = &missing_braces unless (
 	(s/$next_pair_pr_rx\n?/$label = $2;''/eo)
 	||(s/$next_pair_rx\n?/$label = $2;''/eo));
+    # Starlink: PWD: clean up label by removing newlines, spaces and tabs.
+    $label =~ s/\s//g; # Starlink
     &anchor_label($label,$CURRENT_FILE,$_);
 }
 
