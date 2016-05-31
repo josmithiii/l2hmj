@@ -1405,8 +1405,8 @@ sub pre_process {
     &replace_html_special_chars;
     # Remove fake environment which should be invisible to LaTeX2HTML.
     s/\001//m;
-    s/[%]end\s*{latexonly}/\001/gom;
-    s/[%]begin\s*{latexonly}([^\001]*)\001/%/gos;
+    s/[%|\\]end\s*{latexonly}/\001/gom; # JOS: Accept either \begin or %begin
+    s/[%|\\]begin\s*{latexonly}([^\001]*)\001/%/gos;
     s/\001//m;
 
     &preprocess_alltt if defined(&preprocess_alltt);
