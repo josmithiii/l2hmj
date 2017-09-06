@@ -4885,7 +4885,8 @@ sub process_command {
 		    $cmd_trans =~ m|</.*$|;
 		    $pc_after = $` . $pc_after unless ($` =~ /^<>/);
 		    push(@$open_tags_R, $cmd)
-			if ($cmd =~ /$fontchange_rx|$fontweight_rx|$sizechange_rx/o);
+#JOS(Takenko)		if ($cmd =~ /$fontchange_rx|$fontweight_rx|$sizechange_rx/o);
+                        if ($cmd =~ /$sizechange_rx|$fontchange_rx|$fontweight_rx/o);
 		}
 	    } elsif ($mathentity) {
 #print "\nM-ENT:$mathentity :  ";
@@ -12341,12 +12342,16 @@ sub do_cmd_normalsize { # clean
 	$closures .= $post unless ($pre =~ /^<>/);
 	print STDOUT "\n</$next>" if $VERBOSITY > 2;
 
-	if ($next =~ /$fontchange_rx/) {
+#JOS(Takenko):	if ($next =~ /$fontchange_rx/) {
+       if ($next =~ /$sizechange_rx/) {
+           # discard it
+       } elsif ($next =~ /$fontchange_rx/) {
+#END JOS(Takenko)
 	    $font = $next unless ($font);
 	} elsif ($next =~ /$fontweight_rx/) {
 	    $fontwt = $next unless ($fontwt);
-	} elsif ($next =~ /$sizechange_rx/) {
-	    # discard it
+#JOS(T)	} elsif ($next =~ /$sizechange_rx/) {
+#JOS(T)	    # discard it
 	} else {
 	    unshift (@tags, $next);
 	    print STDOUT "\n<<$next>" if $VERBOSITY > 2;
