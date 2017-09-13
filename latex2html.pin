@@ -3514,7 +3514,9 @@ sub process_undefined_environment {
     }
     $fullcontents =  $contents; # save for later \label search.
     # MRO: replaced $* with /m
-    $contents =~ s/\n?$labels_rx(\%([^\n]+$|$EOL))?/\n/gm;
+    # $contents =~ s/\n?$labels_rx(\%([^\n]+$|$EOL))?/\n/gm;
+    # shige (2004-06-16): for [space]\label{}
+    $contents =~ s/\n?\s*$labels_rx(\%([^\n]+$|$EOL))?/\n/gm;
 
     local($tmp) = $contents;
     $tmp =~ s/^((\\par|\%)?\s*\n)+$//g;
