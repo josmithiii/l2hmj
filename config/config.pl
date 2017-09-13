@@ -2228,7 +2228,9 @@ sub find_prog {
   Search: foreach $name (@names) {
     my $base = $name;
     $base =~ s:^.*[/$dd$dd]::; # strip path
-    &checking("for $name");
+    #&checking("for $name");
+    # shige: $base is for the following ?
+    &checking("for $base");
     if($name =~ /\Q$dd/) { # contains dir delimiter?
       unless($name =~ /^$drive_rx\Q$dd/oi) { # absolute dir?
         $name = &simplify_path("$cwd$dd$name");
