@@ -9986,7 +9986,10 @@ sub embed_image {
             unless ($exstr =~ /BORDER/i);
     } else { 
         # MRO: dubious (&extern_image_mark takes only one arg)
-        $extern_image_mark = &extern_image_mark($IMAGE_TYPE,$altst);
+        #$extern_image_mark = &extern_image_mark($IMAGE_TYPE,$altst);
+        # shige 07/20 2017 for $PS_IMAGES
+        my ($typename) = ($PS_IMAGES) ? "ps" : $IMAGE_TYPE;
+        $extern_image_mark = &extern_image_mark($typename, $altst);
     }
 
     my ($anch1,$anch2) = ('','');
