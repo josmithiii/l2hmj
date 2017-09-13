@@ -3895,34 +3895,38 @@ sub make_images {
 	if ($LATEX_DUMP) {
 	    # dump a pre-compiled format
 	    if (!(-f "${PREFIX}images.fmt")) {
-	        print "$INILATEX ./${PREFIX}images.tex\n" 
+               # shige 07/20 2017 (use $dd in place of /):
+               print "$INILATEX .$dd${PREFIX}images.tex\n"
 		    if (($DEBUG)||($VERBOSITY > 1));
 	        print "dumping ${PREFIX}images.fmt\n"
-		    unless ( L2hos->syswait("$INILATEX ./${PREFIX}images.tex"));
+                    # shige 07/20 2017 (use $dd in place of /):
+                    unless ( L2hos->syswait("$INILATEX .$dd${PREFIX}images.tex"));
 	    }
 	    local ($img_fmt) = (-f "${PREFIX}images.fmt");
 	    if ($img_fmt) {
                 # use the pre-compiled format
-	        print "$TEX \"&./${PREFIX}images\" ./${PREFIX}images.tex\n"
+                # shige 07/20 2017 (use $dd in place of /):
+                print "$TEX \"&.$dd${PREFIX}images\" .$dd${PREFIX}images.tex\n"
 		    if (($DEBUG)||($VERBOSITY > 1));
-	        L2hos->syswait("$TEX \"&./${PREFIX}images\" ./${PREFIX}images.tex");
+                # shige 07/20 2017 (use $dd in place of /) (remaining few below not marked):
+                L2hos->syswait("$TEX \"&.$dd${PREFIX}images\" .$dd${PREFIX}images.tex");
 	    } elsif (-f "${PREFIX}images.dvi") {
 	        print "${PREFIX}images.fmt failed, proceeding anyway\n";
 	    } else {
 	        print "${PREFIX}images.fmt failed, trying without it\n";
-		print "$LATEX ./${PREFIX}images.tex\n"
+		print "$LATEX .$dd${PREFIX}images.tex\n"
 		    if (($DEBUG)||($VERBOSITY > 1));
-		L2hos->syswait("$LATEX ./${PREFIX}images.tex");
+		L2hos->syswait("$LATEX .$dd${PREFIX}images.tex");
 	    }
 	} else { &make_latex_images() }
 #	    local($latex_call) = "$LATEX .$dd${PREFIX}images.tex";
 #	    print "$latex_call\n" if (($DEBUG)||($VERBOSITY > 1));
 #	    L2hos->syswait("$latex_call");
-##	    print "$LATEX ./${PREFIX}images.tex\n" if (($DEBUG)||($VERBOSITY > 1));
-##	    L2hos->syswait("$LATEX ./${PREFIX}images.tex");
+##	    print "$LATEX .$dd${PREFIX}images.tex\n" if (($DEBUG)||($VERBOSITY > 1));
+##	    L2hos->syswait("$LATEX .$dd${PREFIX}images.tex");
 ##        }
 	$LaTeXERROR = 0;
-	&process_log_file("./${PREFIX}images.log"); # Get image size info
+	&process_log_file(".$dd${PREFIX}images.log"); # Get image size info
     }
     if ($NO_IMAGES) {
         my $img = "image.$IMAGE_TYPE";
@@ -14110,7 +14114,8 @@ sub do_cmd_textohtmlinfopage {
 sub default_textohtmlinfopage {
     local($_) = @_;
     local($argv) = $argv;
-    if (-f "../$argv") { $argv = &make_href ("../$argv", $argv, ); }
+    # shige 07/20 2017
+    if (-f "..$dd$argv") { $argv = &make_href ("..$dd$argv", $argv, ); }
     $_ = ($INFO && $INFO =~ /^\d+$/
       ? join('', $close_all
 	, "<STRONG>$t_title</STRONG><P>\nThis document was generated using the\n"

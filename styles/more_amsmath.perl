@@ -94,7 +94,10 @@ sub get_eqn_number {
 		, $EQNO_END);
 	}
     } else { $tag = ';SPMnbsp;;SPMnbsp;;SPMnbsp;' }
-#JOS: $*=0;
+    # JOS: $*=0;
+    # shige (2004-10-01): for comment in equation env
+    $scan =~ s/($comment_mark\d+) /$1\n/g;
+    # end shige
     if ($labels) {
 	$labels =~ s/$anchor_mark/$tag/o;
 	($labels , $scan);
