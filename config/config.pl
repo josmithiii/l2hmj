@@ -1292,7 +1292,7 @@ if($opt{'have_pstoimg'}) {
 	if ($vers =~ /9\.(\d+)/) {
 	    $sub_vers = $1;
 	    unless ($sub_vers > 11) {
-		$newcfg{'PNMBLACK'} = ' -black ';
+		$newcfg{'PNMBLACK'} = ' -black -closeness=40 ';
 		print
 	"\n Please update to Netpbm 9.12+, from sourceforge.org/projects/netpbm/\n",
 	" else colored cropping-bars will not be removed.\n";
