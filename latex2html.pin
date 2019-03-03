@@ -433,6 +433,7 @@ if ($INIT_FILE) {
     if (-f $INIT_FILE && -r _) {
         print "Note: Initialising with file: $INIT_FILE\n"
             if ($DEBUG || $VERBOSITY);
+	use lib ".";
         require($INIT_FILE);
     } else {
         die "Error: Could not find file (-init_file): $INIT_FILE\n";
