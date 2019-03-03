@@ -1332,6 +1332,7 @@ if($opt{'have_pstoimg'}) {
 #   }
       &result('yes');
       $newcfg{'PNMCROP'} = $pnmcrop;
+      $newcfg{'PNMCROPOPT'} = ' -sides ';
   }
   else {
     $opt{'have_pstoimg'} = 0;
