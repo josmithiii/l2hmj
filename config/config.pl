@@ -439,13 +439,18 @@ require 5.00305;
 use Cwd;
 use IO::File;
 use lib 'lib';
-use L2hos;
+
+# use FindBin;
+# use L2hos "$FindBin::RealBin/."; # ../L2hos.pm
+# BEGIN {push @INC, '.'; use L2hos; }
+use lib '.'; # for ../L2hos.pm
+use L2hos; # ../L2hos.pm
 
 #use diagnostics;
 use vars qw(%prefs %cfg %newcfg);
 
 # This is the central place to modify the release name!!!
-my $RELEASE = '2012';
+my $RELEASE = '2019';
 # This one is automatically updated by CVS
 my ($VERSION) = q$Revision: 1.2 $ =~ /:\s*(\S*)/;
 
@@ -1276,52 +1281,57 @@ $newcfg{'PNMCROPOPT'} = '';
 
 if($opt{'have_pstoimg'}) {
   my $pnmcrop = &find_prog(&get_name('PNMCROP',1));
+  print "pnmcrop = $pnmcrop\n";
   if($pnmcrop) {
     my ($stat,$msg,$err) = ('','','');
     ($stat,$msg,$err) = &get_out_err("$pnmcrop -version");
-    my $vers = '';
-    $msg = $msg || $err;
-    if ($msg =~ /(^|\s*)Version.*\s([\d\.]+)\s*([\n\r]|$)/is) { $vers = $2; }
-    if ($vers =~ /^199/) {
-	# try left crop
-	&checking('if pnmcrop can crop from one direction');
-        my $timg = "config${dd}timg.pnm";
-	($stat,$msg,$err) = &get_out_err("$pnmcrop -l $timg");
-    } elsif ($vers > 8) {
-	my $sub_vers = '';
-	if ($vers =~ /9\.(\d+)/) {
-	    $sub_vers = $1;
-	    unless ($sub_vers > 11) {
-		$newcfg{'PNMBLACK'} = ' -black -closeness=40 ';
-		print
-	"\n Please update to Netpbm 9.12+, from sourceforge.org/projects/netpbm/\n",
-	" else colored cropping-bars will not be removed.\n";
-	    } else {
-#		$pnmcrop .= ' -sides ';
-		$newcfg{'PNMCROPOPT'} = ' -sides ';
-	    }
-	} else { $newcfg{'PNMCROPOPT'} = ' -sides '; }
-	$pnmcrop .= ' -verbose ' if ($vers >= 10 || $sub_vers > 10);
-	print "\n$pnmcrop";
-	$msg = 'there is nothing to crop'; $stat = '';
-    } else {
-	print "\nThis $vers for $pnmcrop is not recognisable.";
-	$stat = 1;
-    }
-
-    unless(!$stat && $msg =~ /^p\d+[\s\n]+\d+\s+\d+|nothing to crop/is) {
-      $opt{'have_pstoimg'} = 0;
-      &result('no');
-      &warn_no_images();
-      logit(<<"EOF");
-Hint: Get netpbm version 1mar1994p1 (the p1 is important!) to fix this
-      error, or later versions (v9.15+) from  sourceforge.net .
-EOF
-    }
-    else {
+    print "pnmcrop -version = = $msg\n";
+# Assume pnmcrop just works since the mess below fails on Mac OS X on 2019-03-02
+#     my $vers = '';
+#     $msg = $msg || $err;
+#     if ($msg =~ /(^|\s*)Version.*\s([\d\.]+)\s*([\n\r]|$)/is) { $vers = $2; }
+#     if ($vers =~ /^199/) {
+# 	# try left crop
+# 	&checking('if pnmcrop can crop from one direction');
+#         my $timg = "config${dd}timg.pnm";
+# 	($stat,$msg,$err) = &get_out_err("$pnmcrop -l $timg");
+#     } elsif ($vers > 8) {
+# 	my $sub_vers = '';
+# 	if ($vers =~ /9\.(\d+)/) {
+# 	    $sub_vers = $1;
+# 	    unless ($sub_vers > 11) {
+# 		$newcfg{'PNMBLACK'} = ' -black -closeness=40 ';
+# 		print
+# 	"\n Please update to Netpbm 9.12+, from sourceforge.org/projects/netpbm/\n",
+# 	" else colored cropping-bars will not be removed.\n";
+# 	    } else {
+# #		$pnmcrop .= ' -sides ';
+# 		$newcfg{'PNMCROPOPT'} = ' -sides ';
+# 	    }
+# 	} else { $newcfg{'PNMCROPOPT'} = ' -sides '; }
+# 	$pnmcrop .= ' -verbose ' if ($vers >= 10 || $sub_vers > 10);
+# 	print "\n$pnmcrop";
+# 	$msg = 'there is nothing to crop'; $stat = '';
+#     } else {
+# 	print "\nThis $vers for $pnmcrop is not recognisable.";
+# 	$stat = 1;
+#     }
+#
+#     unless(!$stat && $msg =~ /^p\d+[\s\n]+\d+\s+\d+|nothing to crop/is) {
+#       $opt{'have_pstoimg'} = 0;
+#       &result('no');
+#       &warn_no_images();
+#       logit(<<"EOF");
+# Hint: Get netpbm version 1mar1994p1 (the p1 is important!) to fix this
+#       error, or later versions (v9.15+) from  sourceforge.net .
+# EOF
+#     }
+#     else {
+#      &result('yes');
+#      $newcfg{'PNMCROP'} = $pnmcrop;
+#   }
       &result('yes');
       $newcfg{'PNMCROP'} = $pnmcrop;
-    }
   }
   else {
     $opt{'have_pstoimg'} = 0;
@@ -2025,12 +2035,14 @@ print OUT <<"EOT";
 # If you think there are bugs in the configuration procedure, please report
 # them. See the BUGS file on how to do it. Your help is appreciated!
 
-package cfgcache;
+package cfgcache; # ../cfgcache.pm
+
 require Exporter;
 \@ISA = qw(Exporter);
 \@EXPORT = qw(\%cfg);
 
 EOT
+
 $newcfg{'dd'} = $dd;
 my $key;
 foreach $key (sort keys %newcfg) {

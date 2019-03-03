@@ -1156,7 +1156,7 @@ interpval="$ac_cv_sys_interpreter"
 
 
 
-echo "launching proprietary configuration..."
+echo "launching proprietary configuration via $srcdir/config/config.pl" # ./config/config.pl
 
 $PERL $srcdir/config/config.pl \
   HASHBANG=$ac_cv_sys_interpreter \
@@ -1225,10 +1225,8 @@ if test "$?" != "0"; then
 fi
 
 # this is used to get the values from the config file
-eval `perl -w -e 'use cfgcache; foreach(keys %cfg) { print qq($_='"'"'$cfg{$_}'"'"'\n);}'`
-
-
-
+#CWD=`pwd`
+eval `perl -w -e 'use lib "."; use cfgcache; foreach(keys %cfg) { print qq($_='"'"'$cfg{$_}'"'"'\n);}'`
 
 trap '' 1 2 15
 cat > confcache <<\EOF
@@ -1490,4 +1488,3 @@ test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 rm -f config.cache
 echo
 echo "If everything went well,  you may run 'make'"
-

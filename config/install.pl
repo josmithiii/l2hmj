@@ -181,6 +181,7 @@ my ($VERSION) = q$Revision: 0.1 $ =~ /:\s*(\S*)/;
 # Initialize
 # --------------------------------------------------------------------------
 
+use lib ".";
 use cfgcache;
 use L2hos;
 
