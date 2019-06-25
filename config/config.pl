@@ -1330,6 +1330,7 @@ if($opt{'have_pstoimg'}) {
 #      &result('yes');
 #      $newcfg{'PNMCROP'} = $pnmcrop;
 #   }
+      # Not supporting old versions of pnmcropt here:
       &result('yes');
       $newcfg{'PNMCROP'} = $pnmcrop;
       $newcfg{'PNMCROPOPT'} = ' -sides ';

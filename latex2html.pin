@@ -1223,7 +1223,7 @@ sub process_ext_file {
 		if ($skip_to) { next unless ($eline =~ s/$O$skip_to$C//) }
 		$skip_to = '';
 		# skip lines added for pdfTeX/hyperref compatibility
-		next if ($eline =~ /^\\(ifx|else|fi|global \\let|gdef|AtEndDocument|let )/);
+		next if ($eline =~ /^\\(ifx|else|fi|global ?\\let|gdef|AtEndDocument|let )/);
 		# remove \index and \label commands, else invalid links may result
 		$eline =~ s/\\(index|label)\s*($O\d+$C).*\2//g;
 		if ($eline =~ /\\(old)?contentsline/) {
@@ -1406,8 +1406,13 @@ sub pre_process {
     &replace_html_special_chars;
     # Remove fake environment which should be invisible to LaTeX2HTML.
     s/\001//m;
-    s/[%|\\]end\s*{latexonly}/\001/gom; # JOS: Accept either \begin or %begin
-    s/[%|\\]begin\s*{latexonly}([^\001]*)\001/%/gos;
+
+    #! backed out in case causing EOL comment problems:
+    #! s/[%|\\]end\s*{latexonly}/\001/gom; # JOS: Accept either \begin or %begin
+    #! s/[%|\\]begin\s*{latexonly}([^\001]*)\001/%/gos;
+    s/[%]end\s*{latexonly}/\001/gom;
+    s/[%]begin\s*{latexonly}([^\001]*)\001/%/gos;
+
     s/\001//m;
 
     &preprocess_alltt if defined(&preprocess_alltt);
@@ -1426,7 +1431,9 @@ sub pre_process {
     }
     # Move all LaTeX comments into a local list
     print "\n *** move all LaTeX comments to local list *** " if ($VERBOSITY > 1); # JOS
-    s/([ \t]*(^|\G|[^\\]))(%.*(\n[ \t]*|$))/print "%";
+    # jos version replaced by github version 6/25/2019:
+    # s/([ \t]*(^|\G|[^\\]))(%.*(\n[ \t]*|$))/print "%";
+      s/([ \t]*(^|[^\\]))(%.*(\n[ \t]*|$))/print "%";
 	$comments{++$global{'verbatim_counter'}} = "$3";
 	&write_mydb("verbatim", $global{'verbatim_counter'}, $3);
 	"$1$comment_mark".$global{'verbatim_counter'}."\n"/mge;
