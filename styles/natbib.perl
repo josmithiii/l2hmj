@@ -1385,11 +1385,13 @@ sub do_env_thebibliography {
     $citefile = $CURRENT_FILE;
     $citefiles{$bbl_nr} = $citefile;
     s/$next_pair_rx//o;
+#jos/2019-10-28: $* = 1;			# Multiline matching ON
 #    s/^\s*$//g;	# Remove empty lines (otherwise will have paragraphs!)
 #    s/\n//g;	# Remove all \n s --- we format the HTML file ourselves.
 #    $* = 0;			# Multiline matching OFF
     s/\\newblock/\<BR\>/gm;	# break at each \newblock
-    s/\\penalty\d+//mg;		# Remove \penalty declarations
+#jos/2019-10-28: $* = 0;	# Multiline matching OFF
+    s/\\penalty\d+//gm;	# Remove \penalty declarations
 
     local($this_item,$this_kind, $title);
     # skip to the first bibliography entry
@@ -1451,6 +1453,7 @@ sub do_cmd_citestyle {
     local($_) = @_;
     s/$next_pair_pr_rx//o;
     local($style)="citestyle_$2";
+#jos/2019-10-28: if (defined @$style) {
     if (@$style) {
 	($CITE_OPEN_DELIM,
 	 $CITE_CLOSE_DELIM,
