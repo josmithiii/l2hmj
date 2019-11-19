@@ -6917,7 +6917,8 @@ sub make_latex{
     } else {
 	$LOAD_LATEX_COLOR = "\n\\usepackage[dvips]{color}";
     }
-    $LATEX_COLOR = "\\pagecolor[gray]{.85}\\nobreak " unless $LATEX_COLOR;
+    # JOS: change gray to white:
+    $LATEX_COLOR = "\\pagecolor[white]{.85}\\nobreak " unless $LATEX_COLOR;
     if ($preamble =~ /(^|\s*[^%])\s*\\documentstyle/) {
 	# \usepackage is invalid in LaTeX 2.09 and LaTeX-2e compatibility mode
 	$LATEX_COLOR = ''; $LOAD_LATEX_COLOR = '';

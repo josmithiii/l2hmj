@@ -1151,8 +1151,8 @@ sub ps2pnm {
       }
     my $had_nonwhite;
     if($opt{white}) {
-      #jos: Deleted '\n' before first '\d+' because fill can now be anywhere in line:
-      $had_nonwhite = ($ps =~ s/(\d+ \d+ bop gsave) \d*\.\d+ (TeXcolorgray clippath fill grestore)/$1 1 $2/s);
+      #jos: Made '\n' optional before first '\d+' because fill can now be anywhere in line:
+      $had_nonwhite = ($ps =~ s/(\n?\d+ \d+ bop gsave) \d*\.\d+ (TeXcolorgray clippath fill grestore)/$1 1 $2/s);
 #     $had_nonwhite = ($ps =~ s/(\n\d+ \d+ bop gsave) \d*\.\d+ (TeXcolorgray clippath fill grestore)/$1 1 $2/s);
       }
     $ps_changed = $had_papersize || $had_nonwhite;

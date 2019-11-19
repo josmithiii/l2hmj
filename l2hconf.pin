@@ -36,8 +36,8 @@ $INILATEX = "@INITEX@ \"&latex\"";	# initex+latex
 # Use these defaults for dark solid (anti-aliased) characters in text and math.
 #
 $LOAD_LATEX_COLOR = "\\usepackage[dvips]{color}";
-$LATEX_COLOR = "\\pagecolor[gray]{.7}";
-
+# JOS: change gray to white:
+$LATEX_COLOR = "\\pagecolor[white]{.7}";
 
 # -white
 # this overrides the above gray-scale for figures that don't need anti-aliasing
