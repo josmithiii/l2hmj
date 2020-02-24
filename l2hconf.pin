@@ -811,6 +811,22 @@ $FIGURE_SCALE_FACTOR = 1.6;
 #$EXTRA_IMAGE_SCALE = 2;
 
 
+# Modern devices use High Dots Per Inch (HiDPI) displays. To prevent
+# images from looking blurry on these devices, an IMG's SRCSET attribute
+# may specify optional higher-resolution sources. The user's web browser
+# will choose the source closest to the user's display and scale it as
+# needed.
+#
+# When HIDPI_VARIANTS is greater than 1, multiple variants of each
+# image are rendered. For example, a HIDPI_VARIANTS of 3 will produce
+# "2x" and "3x" variants in addition to the "1x" variant.
+#
+# This defaults to 1 for backwards compatibility, but a recommended value
+# for the modern web is 3.
+#
+$HIDPI_VARIANTS = 1;
+
+
 # If this is set to 0 then any inlined images generated from "figure" 
 # environments will NOT be transparent.
 #
