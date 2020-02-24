@@ -588,6 +588,18 @@ if ($PK_GENERATION) {
     #$DVIPSOPT .= ' -M';
 } # end PK_GENERATION
 
+####################################################################
+#
+# Turn off DISCARD_PS if HIDPI_VARIANTS is greater than 1. We need
+# to keep the .ps file around to generate the 2x/3x/etc variants.
+#
+if ($HIDPI_VARIANTS > 1) {
+    $DISCARD_PS = 0;
+} else {
+    # $HIDPI_VARIANTS cannot be <1 or image generation breaks.
+    $HIDPI_VARIANTS = 1;
+}
+
 # The mapping from numbers to accents.
 # These are required to process the \accent command, which is found in
 # tables of contents whenever there is an accented character in a
@@ -3592,8 +3604,8 @@ sub process_undefined_environment {
 		# Size is OK; recycle it!
 		++$global_page_num;
 		$_ = $cached ;    # ...perhaps restoring the desired size.
-		s/(${PREFIX}T?img)\d+\.($IMAGE_TYPE|html)/
-			&rename_html($&,"$1$global_page_num.$2")/geo;
+		s/(${PREFIX}T?img)\d+(_\d+x)?\.($IMAGE_TYPE|html)/
+			&rename_html($&,"$1$global_page_num$2.$3")/geo;
 	    } else {
 		if ($env =~ /equation/) { &extract_eqno($name,$cached) }
 		$_ = "";				# The old Image has wrong size!
@@ -4108,6 +4120,33 @@ sub process_log_file {
     close(LOG);
 }
 
+sub get_image_name {
+    my ($basename, $hidpi_scale) = @_;
+    my $suffix = ($hidpi_scale == 1 ? "" : "_${hidpi_scale}x");
+    my $result = "${PREFIX}${basename}${suffix}.$IMAGE_TYPE";
+    return $result;
+}
+
+sub run_pstoimg {
+    my ($input,$output_basename,$base_scale,$args) = @_;
+
+    for (my $i = 1; $i <= $HIDPI_VARIANTS; $i++) {
+        my $output = &get_image_name($output_basename, $i);
+        my $scale = $base_scale * $i;
+
+        L2hos->Unlink($output);
+
+        if (L2hos->syswait( "$PSTOIMG -type $IMAGE_TYPE "
+            . $args
+            . (($scale ne 1) ? "-scale $scale " : '' )
+            . "-out $output $input"
+        )) {
+            print "\nError while converting image: $!\n";
+            return;
+        }
+    }
+}
+
 sub extract_image { # clean
     my ($page_num,$name) = @_;
 
@@ -4183,14 +4222,13 @@ sub extract_image { # clean
 
 	    # MRO: Patches for image conversion with pstoimg
 	    # RRM: ...with modifications and fixes
-	    L2hos->Unlink("${PREFIX}$img");
 	    &close_dbm_database if $DJGPP;
             print "Converting image #$new_num\n";
 
 	    if ( ($name =~ /figure/) || $psimage || $scale || $thumbnail) {
 		$scale = $FIGURE_SCALE_FACTOR unless ($scale);
 		print "\nFIGURE: $name scaled $scale  $aalias\n" if ($VERBOSITY > 2);
-		(L2hos->syswait( "$PSTOIMG -type $IMAGE_TYPE "
+		(run_pstoimg("$psname.ps", $basename, $scale, ""
 		. ($DEBUG ? '-debug ' : '-quiet ' )
 		. ($TMPDIR ? "-tmp $TMPDIR " : '' )
 		. (($DISCARD_PS && !$thumbnail && !$psimage)? "-discard " :'')
@@ -4202,18 +4240,14 @@ sub extract_image { # clean
 		. $croparg
 		. ($color_depth || '')
 		. (($flip) ? "-flip $flip " : '' )
-		. (($scale > 0) ? "-scale $scale " : '' )
 		. (((($TRANSPARENT_FIGURES && ($env =~ /figure/o))||($trans))
 		     &&(!($trans =~ /no/))) ? "-transparent " : '')
 		. (($WHITE_BACKGROUND) ? "-white " : '' )
-		. "-out ${PREFIX}$img $psname.ps"
-		) ) # ||!(print "\nWriting image: ${PREFIX}$img"))
-		    && print "\nError while converting image: $!\n";
+		) );
 
 		if ($thumbnail) { # $thumbnail contains the reduction factor
-		    L2hos->Unlink("${PREFIX}T$img");
 		    print "\nIMAGE thumbnail: $name" if ($VERBOSITY > 2);
-		    (L2hos->syswait( "$PSTOIMG -type $IMAGE_TYPE "
+		    (run_pstoimg("$psname.ps", "T$basename", $thumbnail, ""
 		    . ($DEBUG ? '-debug ' : '-quiet ' )
 		    . ($TMPDIR ? "-tmp $TMPDIR " : '' )
 		    . (($DISCARD_PS && !$psimage) ? "-discard " : '' )
@@ -4224,12 +4258,9 @@ sub extract_image { # clean
 		    . (($custom_size) ? "-geometry $custom_size " : '' )
 		    . ($color_depth || '')
 		    . (($flip) ? "-flip $flip " : '' )
-		    . (($thumbnail > 0) ? "-scale $thumbnail " : '' )
 		    . ((($trans)&&(!($trans =~ /no/))) ? "-transparent " : '')
 		    . (($WHITE_BACKGROUND) ? "-white " : '' )
-		    . "-out ${PREFIX}T$img $psname.ps"
-		    ) ) # ||!(print "\nWriting image: ${PREFIX}T$img"))
-			&& print "\nError while converting thumbnail: $!\n";
+		    ) );
 		    $thumbnail = "${PREFIX}T$img";
 		}
 	    } elsif (($exscale &&(!$PK_GENERATION))&&($width{$name})) {
@@ -4245,7 +4276,7 @@ sub extract_image { # clean
 		    $under = "d" if (($name =~/inline|indisplay/)&&($depth{$name}));
 		}
 		print "\nIMAGE: $name  scaled by $scale \n" if ($VERBOSITY > 2);
-		(L2hos->syswait( "$PSTOIMG -type $IMAGE_TYPE "
+		(run_pstoimg("$psname.ps", $basename, $scale, ""
 		. ($DEBUG ? '-debug ' : '-quiet ' )
 		. ($TMPDIR ? "-tmp $TMPDIR " : '' )
 		. (($DISCARD_PS)? "-discard " : '' )
@@ -4254,16 +4285,13 @@ sub extract_image { # clean
 		    "-antialias -depth 1 " :'')
 		. (($custom_size)? "-geometry $custom_size " : '' )
                 . $croparg
-		. (($scale != 1)? "-scale $scale " : '' )
 		. ((($exscale)&&($exscale != 1)&&
 		    !($ANTI_ALIAS_TEXT &&($LATEX_COLOR)))?
 			"-shoreup $exscale$under " :'')
 		. ((($TRANSPARENT_FIGURES ||($trans))
 		     &&(!($trans =~ /no/)))? "-transparent " : '')
 		. (($WHITE_BACKGROUND && !$TRANSPARENT_FIGURES) ? "-white " : '' )
-		. "-out ${PREFIX}$img $psname.ps"
-		) ) # ||!(print "\nWriting image: ${PREFIX}$img"))
-		    && print "\nError while converting image: $!\n";
+		) );
 	    } else {
 		print "\nIMAGE: $name\n" if ($VERBOSITY > 2);
 		my $under = '';
@@ -4279,7 +4307,7 @@ sub extract_image { # clean
 		    $under = "d" if (($name =~/inline|indisplay/)&&($depth{$name}));
 		} elsif ($mathscale) { $scale = $mathscale; }
 
-		(L2hos->syswait("$PSTOIMG -type $IMAGE_TYPE "
+		(run_pstoimg("$psname.ps", $basename, $scale, ""
 		. ($DEBUG ? '-debug ' : '-quiet ' )
 		. ($TMPDIR ? "-tmp $TMPDIR " : '' )
 		. (($DISCARD_PS) ? "-discard " : '' )
@@ -4289,7 +4317,6 @@ sub extract_image { # clean
 		. ((($exscale)&&($exscale != 1)&&
 		    !($ANTI_ALIAS_TEXT &&($LATEX_COLOR)))?
 			"-shoreup $exscale " :'')
-		. (($scale ne 1) ? "-scale $scale " : '' )
 		. (($custom_size) ? "-geometry $custom_size " : '' )
                 . $croparg
 #		.  (($name =~ /(equation|eqnarray)/) ? "-rightjustify $lwidth " : '')
@@ -4300,9 +4327,7 @@ sub extract_image { # clean
 		. ((($TRANSPARENT_FIGURES||($trans))
 		    &&(!($trans =~ /no/))) ? "-transparent " : '')
 		. (($WHITE_BACKGROUND && !$TRANSPARENT_FIGURES) ? "-white " : '' )
-		. "-out ${PREFIX}$img $psname.ps")
-		) #|| !(print "\nWriting image: ${PREFIX}$img"))
-		    && print "\nError while converting image\n";
+		) );
 	    }
 	    if (! -r "${PREFIX}$img") {
 		&write_warnings("\nFailed to convert image $psname.ps")
@@ -4311,7 +4336,7 @@ sub extract_image { # clean
 	}
     }
     print "\nextracted $name as $page_num\n" if ($VERBOSITY > 1);
-    &embed_image("${PREFIX}$img", $name, $external, $alt, $thumbnail, $map,
+    &embed_image($basename, $name, $external, $alt, $thumbnail, $map,
         $align, $usemap, $exscale, $exstr);
 }
 
@@ -9908,8 +9933,10 @@ sub normalize_sections {
 }
 
 sub embed_image {
-    my ($url,$name,$external,$altst,$thumbnail,$map,$align,
+    my ($output_basename,$name,$external,$altst,$thumbnail,$map,$align,
 	$usemap,$exscale,$exstr) = @_;
+
+    my $url = &get_image_name($output_basename, 1);
     my $imgID = '';
     my $urlimg = $url;
     my $ismap = $map ? " ISMAP" : '';
@@ -10062,6 +10089,21 @@ sub embed_image {
 	    if ($ausemp) { $result .= " $ausemp" }
 	    $result .= "\n" unless (($result =~ /\n *$/m)|| !$imagesize);
 	    $result .= " SRC=\"$url\"";
+
+        if ($HIDPI_VARIANTS > 1) {
+            $result .= " SRCSET=\"";
+
+            for (my $i = 1; $i <= $HIDPI_VARIANTS; $i++) {
+                $result .=  join(''
+                    , ($i > 1) ? "," : ""
+                    , &find_unique(&get_image_name($output_basename, $i))
+                    , " ${i}x"
+                );
+            }
+
+            $result .= "\""
+        }
+
 	    if ($altst) { $result .= $altst }
 	    $result .= ">";
 	}
@@ -10213,7 +10255,9 @@ sub rename_html {
 	    &write_warnings("File $from is missing!\n");
 	}
     }
-    L2hos->Rename("$from_prefix.old", "$to_prefix.$IMAGE_TYPE");
+    if (-f "$from_prefix.old") {
+        L2hos->Rename("$from_prefix.old", "$to_prefix.$IMAGE_TYPE");
+    }
     $to;
 }
 
