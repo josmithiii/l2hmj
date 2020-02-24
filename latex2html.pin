@@ -4240,7 +4240,6 @@ sub extract_image { # clean
 		. $croparg
 		. ($color_depth || '')
 		. (($flip) ? "-flip $flip " : '' )
-		. (($scale > 0) ? "-scale $scale " : '' )
 		. (((($TRANSPARENT_FIGURES && ($env =~ /figure/o))||($trans))
 		     &&(!($trans =~ /no/))) ? "-transparent " : '')
 		. (($WHITE_BACKGROUND) ? "-white " : '' )
@@ -4248,7 +4247,7 @@ sub extract_image { # clean
 
 		if ($thumbnail) { # $thumbnail contains the reduction factor
 		    print "\nIMAGE thumbnail: $name" if ($VERBOSITY > 2);
-		    (run_pstoimg("$psname.ps", "T$basename", 1, ""
+		    (run_pstoimg("$psname.ps", "T$basename", $thumbnail, ""
 		    . ($DEBUG ? '-debug ' : '-quiet ' )
 		    . ($TMPDIR ? "-tmp $TMPDIR " : '' )
 		    . (($DISCARD_PS && !$psimage) ? "-discard " : '' )
@@ -4259,7 +4258,6 @@ sub extract_image { # clean
 		    . (($custom_size) ? "-geometry $custom_size " : '' )
 		    . ($color_depth || '')
 		    . (($flip) ? "-flip $flip " : '' )
-		    . (($thumbnail > 0) ? "-scale $thumbnail " : '' )
 		    . ((($trans)&&(!($trans =~ /no/))) ? "-transparent " : '')
 		    . (($WHITE_BACKGROUND) ? "-white " : '' )
 		    ) );
