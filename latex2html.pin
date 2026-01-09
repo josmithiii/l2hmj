@@ -8192,10 +8192,9 @@ sub make_real_href {
 	if (($target)&&($HTML_VERSION > 3.2));
     #HWS: Nested anchors not allowed.
     $text =~ s/<A .*><\/A>//go;
-    #JKR: ~ is handled different - &#126; is turned to ~ later.
-    #$link =~ s/&#126;/$percent_mark . "7E"/geo;
-    if ($text eq $link) { $text =~ s/~/&#126;/g; }
-    $link =~ s/~/&#126;/g;
+    #JKR: ~ is handled different - use URL encoding %7E for hrefs
+    if ($text eq $link) { $text =~ s/~/%7E/g; }
+    $link =~ s/~/%7E/g;
     # catch \url or \htmlurl
     $link =~ s/\\(html)?url\s*(($O|$OP)\d+($C|$CP))([^<]*)\2/$5/;
     $link =~ s:(<TT>)?<A [^>]*>([^<]*)</A>(</TT>)?(([^<]*)|$):$2$4:;
@@ -8210,10 +8209,9 @@ sub make_href_noexpand { # clean
     do {$name = "tex2html". $href_name++} unless $name;
     #HWS: Nested anchors not allowed.
     $text =~ s/<A .*><\/A>//go;
-    #JKR: ~ is handled different - &#126; is turned to ~ later.
-    #$link =~ s/&#126;/$percent_mark . "7E"/geo;
-    if ($text eq $link) { $text =~ s/~/&#126;/g; }
-    $link =~ s/~/&#126;/g;
+    #JKR: ~ is handled different - use URL encoding %7E for hrefs
+    if ($text eq $link) { $text =~ s/~/%7E/g; }
+    $link =~ s/~/%7E/g;
     # catch \url or \htmlurl
     $link =~ s/\\(html)?url\s*(($O|$OP)\d+($C|$CP))([^<]*)\2/$5/;
     $link =~ s:(<TT>)?<A [^>]*>([^<]*)</A>(</TT>)?(([^<]*)|$):$2$4:;
