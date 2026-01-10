@@ -98,6 +98,21 @@ sub get_eqn_number {
     # shige (2004-10-01): for comment in equation env
     $scan =~ s/($comment_mark\d+) /$1\n/g;
     # end shige
+    # JOS 2025: Update equation labels with computed number for correct cross-refs
+    if ($labels && $tag && !($tag =~ /SPMnbsp/)) {
+	# Extract clean equation number from tag (remove EQNO_START/END)
+	local($clean_eqno) = $tag;
+	$clean_eqno =~ s/^\Q$EQNO_START\E//;
+	$clean_eqno =~ s/\Q$EQNO_END\E$//;
+	$clean_eqno = &simplify($clean_eqno);
+	# Update latex_labels for each label found in the anchors
+	while ($labels =~ /<A[^>]*\sNAME="([^"]+)"/g) {
+	    local($lbl) = $1;
+	    $latex_labels{$lbl} = $clean_eqno;
+	    $symbolic_labels{$lbl} = $clean_eqno;
+	    print "\nEQN_LABEL: $lbl = $clean_eqno" if ($VERBOSITY > 3);
+	}
+    }
     if ($labels) {
 	$labels =~ s/$anchor_mark/$tag/o;
 	($labels , $scan);

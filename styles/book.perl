@@ -91,6 +91,35 @@ sub do_cmd_thetable {
     join('', (($chap =~ /^(0\.)?$/)? '' : $chap)
         , &do_cmd_arabic("${O}0${C}table${O}0$C"), @_[0]) }
 
+# JOS 2025: Implement frontmatter/mainmatter to fix chapter counter sync with LaTeX
+# In frontmatter, chapter counter increments but chapters are unnumbered in LaTeX
+# In mainmatter, chapter counter is reset so numbered chapters start at 1
+sub do_cmd_frontmatter {
+    local($_) = @_;
+    # Nothing special needed - chapters will increment but that's ok
+    # since mainmatter will reset
+    $_;
+}
+
+sub do_cmd_mainmatter {
+    local($_) = @_;
+    # Reset the chapter counter to 0 so next chapter is 1
+    # This is what LaTeX does when entering mainmatter
+    $global{'chapter'} = 0;
+    # Also reset dependent counters (equation, figure, table, footnote)
+    $global{'eqn_number'} = 0;
+    $global{'figure'} = 0;
+    $global{'table'} = 0;
+    $global{'footnote'} = 0;
+    $_;
+}
+
+sub do_cmd_backmatter {
+    local($_) = @_;
+    # Backmatter chapters are unnumbered, but we don't need special handling
+    # since the chapter counter will just continue
+    $_;
+}
 
 1;	# Must be last line
 
