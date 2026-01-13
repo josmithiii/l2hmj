@@ -7205,6 +7205,7 @@ sub make_head_and_body {
 	      "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=$this_charset\">"
 	      : "" )
 	, $LATEX2HTML_META
+	, ($USE_MATHJAX ? &mathjax_script() : '' )
 	, ($BASE ? "<BASE HREF=\"$BASE\">" : "" )
 	, $STYLESHEET_CASCADE
 	, ($STYLESHEET ? "<LINK REL=\"STYLESHEET\" HREF=\"$STYLESHEET\">" : '' )
@@ -7213,6 +7214,27 @@ sub make_head_and_body {
 	, "<BODY $body>", '');
 }
 
+sub mathjax_script {
+    # Generate MathJax configuration and loader script
+    my $url = $MATHJAX_URL || 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+    return join("\n",
+        '<script>',
+        'MathJax = {',
+        '  tex: {',
+        "    inlineMath: [['\\\\(', '\\\\)']],",
+        "    displayMath: [['\\\\[', '\\\\]']],",
+        '    processEscapes: false,',
+        '    processEnvironments: true,',
+        "    tags: 'ams'",
+        '  },',
+        '  options: {',
+        "    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']",
+        '  }',
+        '};',
+        '</script>',
+        "<script src=\"$url\" async></script>"
+    );
+}
 
 sub style_sheet {
     local($env,$id,$style);
@@ -9043,9 +9065,9 @@ sub text_cleanup {
     # remove redundant (not <P></P>) empty tags, incl. with attributes
     s/\n?<([^PD >][^>]*)>\s*<\/\1>//g;
     s/\n?<([^PD >][^>]*)>\s*<\/\1>//g;
-    # remove redundant empty tags (not </P><P> or <TD> or <TH>)
+    # remove redundant empty tags (not </P><P> or <TD> or <TH> or <script>)
     s/<\/(TT|[^PTH][A-Z]+)><\1>//g;
-    s/<([^PD ]+)(\s[^>]*)?>\n*<\/\1>//g;
+    s/<((?!script)[^PD ]+)(\s[^>]*)?>\n*<\/\1>//gi;
 
 
 #JCL(jcl-hex)

@@ -52,6 +52,14 @@ The build uses a **preprocessor pattern**:
 - `@MARKER@` placeholders in .pin files get replaced with values from `cfgcache.pm`
 - Never edit generated scripts (`latex2html`, `pstoimg`, `texexpand`, `l2hconf.pm`) directly
 
+Preprocessor directives in `.pin` files:
+```perl
+#if @condition@       # Include block if condition is true
+#else                 # Alternative block
+#fi                   # End conditional
+#unless @condition@   # Include block if condition is false
+```
+
 ### Key Source Files
 
 | Template | Generated | Purpose |
@@ -63,7 +71,7 @@ The build uses a **preprocessor pattern**:
 
 ### Module Directories
 
-- **styles/** - LaTeX package handlers (98 `.perl` files: amsmath, graphics, hyperref, etc.)
+- **styles/** - LaTeX package handlers (98 `.perl` files: amsmath, graphics, hyperref, etc.). See `TEMPLATE.perl` for creating new handlers.
 - **versions/** - HTML output format modules (html2_2.pl through html4_1.pl, math.pl, i18n.pl)
 - **L2hos/** - OS abstraction (Unix.pm, Mac.pm, Win32.pm, Dos.pm, OS2.pm)
 - **tests/** - Test `.tex` files and generated output
@@ -91,6 +99,7 @@ Template for user config: `dot.latex2html-init`
 - Module names: CamelCase (`L2hos.pm`)
 - Package variables: `$UPPER_CASE`
 - Verify syntax: `perl -c path/to/file.pm`
+- For `.pin` files: edit the template, run `make` to regenerate
 
 ## Testing Guidelines
 

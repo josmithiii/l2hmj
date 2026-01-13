@@ -24,8 +24,23 @@ if ($HTML_VERSION < 3) {
     return(1);
 }
 
-$display_env_rx = join('|', $display_env_rx 
+$display_env_rx = join('|', $display_env_rx
 	,'gather','multline','align','split');
+
+# Helper for MathJax output of display math environments
+sub mathjax_display_env {
+    local($envname, $_) = @_;
+    local($labels);
+    ($_,$labels) = &extract_labels($_);
+    $_ = &revert_to_raw_tex($_);
+    s/^\s+//; s/\s+$//;
+    # Store in verbatim hash to protect from further processing
+    local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
+        "\\begin{$envname}", $_, "\\end{$envname}", '</DIV><P></P>');
+    $global{'verbatim_counter'}++;
+    $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
+    return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+}
 
 sub do_htmlmath_array {
     local($colspec) = @_;
@@ -208,6 +223,10 @@ sub do_env_subequations {
 
 sub process_env_equation {
     local($numbered, $_) = @_;
+    # MathJax path
+    if ($USE_MATHJAX) {
+        return &mathjax_display_env($numbered ? "equation" : "equation*", $_);
+    }
     local($math_mode, $failed, $labels, $comment, $doimage) = ("equation",'','','','');
     local($attribs, $border);
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -346,9 +365,11 @@ $thismath =~ s/(^\s*|\s*$)//mg;
 
 
 sub do_env_multline {
+    return &mathjax_display_env("multline", @_) if ($USE_MATHJAX);
     &process_env_multline(1,@_);
 }
 sub do_env_multlinestar {
+    return &mathjax_display_env("multline*", @_) if ($USE_MATHJAX);
     &process_env_multline(0,@_);
 }
 
@@ -506,6 +527,7 @@ sub process_intertext {
 
 sub do_env_align {
     local($_) = @_;
+    return &mathjax_display_env("align", $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -515,6 +537,7 @@ sub do_env_align {
 
 sub do_env_alignstar {
     local($_) = @_;
+    return &mathjax_display_env("align*", $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -620,6 +643,7 @@ sub do_env_flalignstar {
 
 sub do_env_gather {
     local($_) = @_;
+    return &mathjax_display_env("gather", $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -629,6 +653,7 @@ sub do_env_gather {
 
 sub do_env_gatherstar {
     local($_) = @_;
+    return &mathjax_display_env("gather*", $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -821,6 +846,7 @@ $thismath =~ s/(^\s*|\s*$)//mg;
 
 sub do_env_aligned {
     local($_) = @_;
+    return &mathjax_display_env("aligned", $_) if ($USE_MATHJAX);
     local($saved) = join(''
 	, "\\begin\{aligned\}"
 	, &revert_array_envs($_)
@@ -832,6 +858,7 @@ sub do_env_aligned {
 }
 sub do_env_alignedat {
     local($_) = @_;
+    return &mathjax_display_env("alignedat", $_) if ($USE_MATHJAX);
     $_ = &revert_array_envs($_);
     local($saved) = join(''
 	, "\\begin\{alignedat\}"
@@ -844,6 +871,7 @@ sub do_env_alignedat {
 }
 sub do_env_gathered {
     local($_) = @_;
+    return &mathjax_display_env("gathered", $_) if ($USE_MATHJAX);
     $_ = &revert_array_envs($_);
     local($saved) = join(''
 	, "\\begin\{gathered\}\n"
@@ -856,6 +884,7 @@ sub do_env_gathered {
 }
 sub do_env_cases {
     local($_) = @_;
+    return &mathjax_display_env("cases", $_) if ($USE_MATHJAX);
     $_ = &revert_array_envs($_);
     local($saved) = join(''
 	,"\\begin\{cases\}\n"
@@ -869,6 +898,7 @@ sub do_env_cases {
 
 sub do_env_split {
     local($_) = @_;
+    return &mathjax_display_env("split", $_) if ($USE_MATHJAX);
     local($failed, $labels, $comment, $doimage) = ('','');
     local($saved) = join('',"\\begin\{split\}\n", $_, "\\end\{split\}\n");
     local($sbig,$ebig)= &set_math_size($math_mode);
