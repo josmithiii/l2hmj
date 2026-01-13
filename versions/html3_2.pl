@@ -980,6 +980,17 @@ sub make_math_comment{
 
 sub do_env_math {
     local($_) = @_;
+    # MathJax path - output raw LaTeX with \(...\) delimiters
+    if ($USE_MATHJAX) {
+        local($labels);
+        ($_,$labels) = &extract_labels($_);
+        $_ = &revert_to_raw_tex($_);
+        s/^\s+//; s/\s+$//;
+        local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
+        $global{'verbatim_counter'}++;
+        $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
+        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+    }
     local($math_mode, $failed, $labels, $comment, $img_params) = ("inline",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
     local($attribs, $border);
@@ -1045,6 +1056,18 @@ sub do_env_tex2html_wrap_inline {
 
 sub do_env_equation {
     local($_) = @_;
+    # MathJax path - output raw LaTeX as \begin{equation}...\end{equation}
+    if ($USE_MATHJAX) {
+        local($labels);
+        ($_,$labels) = &extract_labels($_);
+        $_ = &revert_to_raw_tex($_);
+        s/^\s+//; s/\s+$//;
+        local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
+            '\\begin{equation}', $_, '\\end{equation}', '</DIV><P></P>');
+        $global{'verbatim_counter'}++;
+        $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
+        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+    }
     local($math_mode, $failed, $labels, $comment) = ("equation",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
     local($attribs, $border);
@@ -1134,6 +1157,17 @@ sub do_env_equation {
 
 sub do_env_displaymath {
     local($_) = @_;
+    # MathJax path - output raw LaTeX with \[...\] delimiters
+    if ($USE_MATHJAX) {
+        local($labels);
+        ($_,$labels) = &extract_labels($_);
+        $_ = &revert_to_raw_tex($_);
+        s/^\s+//; s/\s+$//;
+        local($mathjax_content) = '<P></P><DIV CLASS="MATHDISPLAY">\\[' . $_ . '\\]</DIV><P></P>';
+        $global{'verbatim_counter'}++;
+        $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
+        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+    }
     local($math_mode, $failed, $labels, $comment) = ("display",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
     local($attribs, $border);
@@ -1168,6 +1202,18 @@ sub do_env_displaymath {
 
 sub do_env_eqnarray {
     local($_) = @_;
+    # MathJax path - output raw LaTeX as \begin{eqnarray}...\end{eqnarray}
+    if ($USE_MATHJAX) {
+        local($labels);
+        ($_,$labels) = &extract_labels($_);
+        $_ = &revert_to_raw_tex($_);
+        s/^\s+//; s/\s+$//;
+        local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
+            '\\begin{eqnarray}', $_, '\\end{eqnarray}', '</DIV><P></P>');
+        $global{'verbatim_counter'}++;
+        $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
+        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+    }
     local($math_mode, $failed, $labels, $comment, $doimage) = ("equation",'','');
     local($attribs, $border);
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -1366,6 +1412,18 @@ $thismath =~ s/(^\s*|\s*$)//mg;
 
 sub do_env_eqnarraystar {
     local($_) = @_;
+    # MathJax path - output raw LaTeX as \begin{eqnarray*}...\end{eqnarray*}
+    if ($USE_MATHJAX) {
+        local($labels);
+        ($_,$labels) = &extract_labels($_);
+        $_ = &revert_to_raw_tex($_);
+        s/^\s+//; s/\s+$//;
+        local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
+            '\\begin{eqnarray*}', $_, '\\end{eqnarray*}', '</DIV><P></P>');
+        $global{'verbatim_counter'}++;
+        $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
+        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+    }
     local($math_mode, $failed, $labels, $comment) = ("equation",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
     local($attribs, $border);
