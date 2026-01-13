@@ -42,6 +42,20 @@ sub mathjax_display_env {
     return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
 }
 
+# Helper for environments that take an argument, e.g., \begin{alignat}{2}
+sub mathjax_display_env_with_arg {
+    local($envname, $arg, $_) = @_;
+    local($labels);
+    ($_,$labels) = &extract_labels($_);
+    $_ = &revert_to_raw_tex($_);
+    s/^\s+//; s/\s+$//;
+    local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
+        "\\begin{$envname}{$arg}", $_, "\\end{$envname}", '</DIV><P></P>');
+    $global{'verbatim_counter'}++;
+    $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
+    return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+}
+
 sub do_htmlmath_array {
     local($colspec) = @_;
     if (defined &do_env_array) {
@@ -551,6 +565,7 @@ sub do_env_alignat {
     $aligns = &missing_braces unless (
 	(s/$next_pair_pr_rx/$aligns = $2;''/e)
 	||(s/$next_pair_rx/$aligns = $2;''/e ));
+    return &mathjax_display_env_with_arg("alignat", $aligns, $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -564,6 +579,7 @@ sub do_env_alignatstar {
     $aligns = &missing_braces unless (
 	(s/$next_pair_pr_rx/$aligns = $2;''/e)
 	||(s/$next_pair_rx/$aligns = $2;''/e ));
+    return &mathjax_display_env_with_arg("alignat*", $aligns, $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -577,6 +593,7 @@ sub do_env_xalignat {
     $aligns = &missing_braces unless (
 	(s/$next_pair_pr_rx/$aligns = $2;''/e)
 	||(s/$next_pair_rx/$aligns = $2;''/e ));
+    return &mathjax_display_env_with_arg("xalignat", $aligns, $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -590,6 +607,7 @@ sub do_env_xalignatstar {
     $aligns = &missing_braces unless (
 	(s/$next_pair_pr_rx/$aligns = $2;''/e)
 	||(s/$next_pair_rx/$aligns = $2;''/e ));
+    return &mathjax_display_env_with_arg("xalignat*", $aligns, $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -603,6 +621,7 @@ sub do_env_xxalignat {
     $aligns = &missing_braces unless (
 	(s/$next_pair_pr_rx/$aligns = $2;''/e)
 	||(s/$next_pair_rx/$aligns = $2;''/e ));
+    return &mathjax_display_env_with_arg("xxalignat", $aligns, $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -616,6 +635,7 @@ sub do_env_xxalignatstar {
     $aligns = &missing_braces unless (
 	(s/$next_pair_pr_rx/$aligns = $2;''/e)
 	||(s/$next_pair_rx/$aligns = $2;''/e ));
+    return &mathjax_display_env_with_arg("xxalignat*", $aligns, $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -625,6 +645,7 @@ sub do_env_xxalignatstar {
 
 sub do_env_flalign {
     local($_) = @_;
+    return &mathjax_display_env("flalign", $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
@@ -634,6 +655,7 @@ sub do_env_flalign {
 
 sub do_env_flalignstar {
     local($_) = @_;
+    return &mathjax_display_env("flalign*", $_) if ($USE_MATHJAX);
     local($math_mode, $attribs, $border) = ("equation",'','');
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
