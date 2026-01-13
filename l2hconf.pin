@@ -608,7 +608,7 @@ $NO_SIMPLE_MATH = 0;
 # Set to 1 to use MathJax for rendering math instead of images.
 # This makes equations copy-paste friendly for LLMs and improves accessibility.
 #
-$USE_MATHJAX = 0;
+$USE_MATHJAX = 1;
 
 # MathJax CDN URL (or path to local installation)
 $MATHJAX_URL = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
