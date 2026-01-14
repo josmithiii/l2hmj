@@ -7251,38 +7251,15 @@ sub mathjax_script {
 
 sub mathjax_macros_js {
     # Generate JavaScript for MathJax macro definitions
+    # Users can add custom macros via %MATHJAX_MACROS in ~/.latex2html-init
+    #
     # Simple macros (no arguments) - value is the replacement text
-    my %simple_macros = (
-        # Definition symbols (isdef = "is defined as" with triangle)
-        'isdef'     => '\\mathrel{\\stackrel{\\mathrm{\\Delta}}{=}}',
-        'isdefs'    => '\\;\\isdef\\;',
-        'isdefss'   => '\\,\\;\\isdef\\;\\,',
-        'isdeftext' => '\\mathrel{\\stackrel{\\scriptscriptstyle\\mathrm{\\Delta}}{\\scriptstyle=}}',
-        # Spaced relation symbols
-        'eqsp'      => '\\;=\\;',
-        'eqss'      => '\\,\\;=\\;\\,',
-        'eqs'       => '\\;=\\;',
-        'approxs'   => '\\,\\;\\approx\\;\\,',
-    );
+    # Example: 'isdef' => '\\mathrel{\\stackrel{\\mathrm{\\Delta}}{=}}'
+    my %simple_macros = ();
 
     # Macros with arguments - value is [replacement, num_args]
-    # In MathJax: macro: ['replacement with #1', numArgs]
-    my %arg_macros = (
-        # Text formatting commands (for use in math mode)
-        'emph'      => ['\\textit{#1}', 1],
-        'textbf'    => ['\\mathbf{\\text{#1}}', 1],
-        # Box commands (don't redefine fbox - MathJax's \boxed uses \fbox internally)
-        'zbox'      => ['\\boxed{#1}', 1],
-        # Complex number notation (use \\lbrace/\\rbrace to avoid delimiter issues)
-        # CamelCase versions
-        'realPart'   => ['\\text{re}\\left\\lbrace #1 \\right\\rbrace', 1],
-        'realPartSq' => ['\\text{re}^2\\left\\lbrace #1 \\right\\rbrace', 1],
-        'imagPart'   => ['\\text{im}\\left\\lbrace #1 \\right\\rbrace', 1],
-        'imagPartSq' => ['\\text{im}^2\\left\\lbrace #1 \\right\\rbrace', 1],
-        # Lowercase versions
-        'realpart'   => ['\\text{re}\\left\\lbrace #1 \\right\\rbrace', 1],
-        'imagpart'   => ['\\text{im}\\left\\lbrace #1 \\right\\rbrace', 1],
-    );
+    # Example: 'zbox' => ['\\boxed{#1}', 1]
+    my %arg_macros = ();
 
     # Merge with user-defined macros (user macros override defaults)
     if (%MATHJAX_MACROS) {
@@ -7316,152 +7293,34 @@ sub mathjax_macros_js {
     return join(",\n", @macro_lines);
 }
 
+# Commands that should pass through to MathJax without LaTeX2HTML processing.
+# Users can define custom entries in ~/.latex2html-init before this runs.
+# This preserves any user-defined entries.
 %mathjax_protected_cmds = (
-    'realPart'   => 1,
-    'realPartSq' => 1,
-    'imagPart'   => 1,
-    'imagPartSq' => 1,
-    'realpart'   => 1,
-    'imagpart'   => 1,
-    'zbox'       => 1,
-    'isdef'      => 1,
-    'isdefs'     => 1,
-    'isdefss'    => 1,
-    'isdeftext'  => 1,
-    'eqs'        => 1,
-    'eqsp'       => 1,
-    'eqss'       => 1,
-    'approxs'    => 1,
+    %mathjax_protected_cmds,  # preserve user-defined entries from init files
 );
 
-# MathJax pass-through handlers
-# Use \@#\@\@ protection marker to prevent re-processing
-
-# Simple macros (no arguments)
-sub do_cmd_isdef {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@isdef " : "") . $_;
-}
-
-sub do_cmd_isdefs {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@isdefs " : "") . $_;
-}
-
-sub do_cmd_isdefss {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@isdefss " : "") . $_;
-}
-
-sub do_cmd_isdeftext {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@isdeftext " : "") . $_;
-}
-
-sub do_cmd_eqs {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@eqs " : "") . $_;
-}
-
-sub do_cmd_eqsp {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@eqsp " : "") . $_;
-}
-
-sub do_cmd_eqss {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@eqss " : "") . $_;
-}
-
-sub do_cmd_approxs {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\\@#\@\@approxs " : "") . $_;
-}
-
-# Macros with one argument - extract arg and pass through with protection
-sub do_cmd_realPart {
-    local($_) = @_;
-    if ($USE_MATHJAX) {
-        my $arg = '';
-        s/$next_pair_pr_rx/$arg = $2;''/eo
-            || s/$next_pair_rx/$arg = $2;''/eo
-            || ($arg = &missing_braces);
-        return "\\\@#\@\@realPart{$arg}" . $_;
-    }
-    $_;
-}
-
-sub do_cmd_imagPart {
-    local($_) = @_;
-    if ($USE_MATHJAX) {
-        my $arg = '';
-        s/$next_pair_pr_rx/$arg = $2;''/eo
-            || s/$next_pair_rx/$arg = $2;''/eo
-            || ($arg = &missing_braces);
-        return "\\\@#\@\@imagPart{$arg}" . $_;
-    }
-    $_;
-}
-
-sub do_cmd_realpart {
-    local($_) = @_;
-    if ($USE_MATHJAX) {
-        my $arg = '';
-        s/$next_pair_pr_rx/$arg = $2;''/eo
-            || s/$next_pair_rx/$arg = $2;''/eo
-            || ($arg = &missing_braces);
-        return "\\\@#\@\@realpart{$arg}" . $_;
-    }
-    $_;
-}
-
-sub do_cmd_imagpart {
-    local($_) = @_;
-    if ($USE_MATHJAX) {
-        my $arg = '';
-        s/$next_pair_pr_rx/$arg = $2;''/eo
-            || s/$next_pair_rx/$arg = $2;''/eo
-            || ($arg = &missing_braces);
-        return "\\\@#\@\@imagpart{$arg}" . $_;
-    }
-    $_;
-}
-
-sub do_cmd_realPartSq {
-    local($_) = @_;
-    if ($USE_MATHJAX) {
-        my $arg = '';
-        s/$next_pair_pr_rx/$arg = $2;''/eo
-            || s/$next_pair_rx/$arg = $2;''/eo
-            || ($arg = &missing_braces);
-        return "\\\@#\@\@realPartSq{$arg}" . $_;
-    }
-    $_;
-}
-
-sub do_cmd_imagPartSq {
-    local($_) = @_;
-    if ($USE_MATHJAX) {
-        my $arg = '';
-        s/$next_pair_pr_rx/$arg = $2;''/eo
-            || s/$next_pair_rx/$arg = $2;''/eo
-            || ($arg = &missing_braces);
-        return "\\\@#\@\@imagPartSq{$arg}" . $_;
-    }
-    $_;
-}
-
-sub do_cmd_zbox {
-    local($_) = @_;
-    if ($USE_MATHJAX) {
-        my $arg = '';
-        s/$next_pair_pr_rx/$arg = $2;''/eo
-            || s/$next_pair_rx/$arg = $2;''/eo
-            || ($arg = &missing_braces);
-        return "\\\@#\@\@zbox{$arg}" . $_;
-    }
-    $_;
-}
+# MathJax pass-through handlers for user macros should be defined in
+# ~/.latex2html-init using this pattern:
+#
+# Simple macro (no arguments):
+#   sub do_cmd_isdef {
+#       local($_) = @_;
+#       return ($USE_MATHJAX ? "\\\@#\@\@isdef " : "") . $_;
+#   }
+#
+# Macro with one argument:
+#   sub do_cmd_zbox {
+#       local($_) = @_;
+#       if ($USE_MATHJAX) {
+#           my $arg = '';
+#           s/$next_pair_pr_rx/$arg = $2;''/eo
+#               || s/$next_pair_rx/$arg = $2;''/eo
+#               || ($arg = &missing_braces);
+#           return "\\\@#\@\@zbox{$arg}" . $_;
+#       }
+#       $_;
+#   }
 
 sub style_sheet {
     local($env,$id,$style);
