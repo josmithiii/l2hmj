@@ -7271,9 +7271,8 @@ sub mathjax_macros_js {
         # Text formatting commands (for use in math mode)
         'emph'      => ['\\textit{#1}', 1],
         'textbf'    => ['\\mathbf{\\text{#1}}', 1],
-        # Box commands
+        # Box commands (don't redefine fbox - MathJax's \boxed uses \fbox internally)
         'zbox'      => ['\\boxed{#1}', 1],
-        'fbox'      => ['\\boxed{#1}', 1],
         # Complex number notation (use \\lbrace/\\rbrace to avoid delimiter issues)
         # CamelCase versions
         'realPart'   => ['\\text{re}\\left\\lbrace #1 \\right\\rbrace', 1],
