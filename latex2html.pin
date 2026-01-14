@@ -7216,8 +7216,11 @@ sub make_head_and_body {
 
 sub mathjax_script {
     # Generate MathJax configuration and loader script
+    # Store in verbatim hash to protect from text_cleanup (which converts \, to space)
     my $url = $MATHJAX_URL || 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-    return join("\n",
+    # Build macros section - combine default macros with user-defined ones
+    my $macros_js = &mathjax_macros_js();
+    my $script_content = join("\n",
         '<script>',
         'MathJax = {',
         '  tex: {',
@@ -7225,7 +7228,10 @@ sub mathjax_script {
         "    displayMath: [['\\\\[', '\\\\]']],",
         '    processEscapes: false,',
         '    processEnvironments: true,',
-        "    tags: 'ams'",
+        "    tags: 'ams',",
+        '    macros: {',
+        $macros_js,
+        '    }',
         '  },',
         '  options: {',
         "    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']",
@@ -7234,6 +7240,44 @@ sub mathjax_script {
         '</script>',
         "<script src=\"$url\" async></script>"
     );
+    # Protect from text_cleanup by storing in verbatim hash
+    $global{'verbatim_counter'}++;
+    $verbatim{$global{'verbatim_counter'}} = $script_content;
+    return join('', $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+}
+
+sub mathjax_macros_js {
+    # Generate JavaScript for MathJax macro definitions
+    # Default macros for common LaTeX commands
+    my %default_macros = (
+        # Definition symbols (isdef = "is defined as" with triangle)
+        'isdef'     => '\\mathrel{\\stackrel{\\mathrm{\\Delta}}{=}}',
+        'isdefs'    => '\\;\\isdef\\;',
+        'isdefss'   => '\\,\\;\\isdef\\;\\,',
+        'isdeftext' => '\\mathrel{\\stackrel{\\scriptscriptstyle\\mathrm{\\Delta}}{\\scriptstyle=}}',
+        # Spaced relation symbols
+        'eqsp'      => '\\;=\\;',
+        'eqss'      => '\\,\\;=\\;\\,',
+        'eqs'       => '\\;=\\;',
+        'approxs'   => '\\,\\;\\approx\\;\\,',
+    );
+
+    # Merge with user-defined macros (user macros override defaults)
+    if (%MATHJAX_MACROS) {
+        foreach my $key (keys %MATHJAX_MACROS) {
+            $default_macros{$key} = $MATHJAX_MACROS{$key};
+        }
+    }
+
+    # Convert to JavaScript object notation
+    my @macro_lines;
+    foreach my $name (sort keys %default_macros) {
+        my $def = $default_macros{$name};
+        # Escape backslashes for JavaScript string
+        $def =~ s/\\/\\\\/g;
+        push @macro_lines, "      $name: '$def'";
+    }
+    return join(",\n", @macro_lines);
 }
 
 sub style_sheet {

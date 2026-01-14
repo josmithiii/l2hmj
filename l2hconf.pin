@@ -613,6 +613,17 @@ $USE_MATHJAX = 1;
 # MathJax CDN URL (or path to local installation)
 $MATHJAX_URL = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
 
+# Custom MathJax macro definitions
+# Add user-defined LaTeX macros here. These will be added to MathJax's configuration
+# so that custom macros in your LaTeX documents will be rendered correctly.
+# Default macros for \isdef, \isdefs, \eqsp, etc. are built-in.
+# Example:
+#   %MATHJAX_MACROS = (
+#       'mycommand' => '\\frac{1}{2}',
+#       'RR'        => '\\mathbb{R}',
+#   );
+%MATHJAX_MACROS = ();
+
 
 # -unsegment
 # Use this to translate a segmented document as if it were not

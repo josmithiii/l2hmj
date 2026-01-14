@@ -986,6 +986,7 @@ sub do_env_math {
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
         s/^\s+//; s/\s+$//;
+        s/\\protect\s*//g;  # Strip \protect for MathJax
         local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
@@ -1062,6 +1063,7 @@ sub do_env_equation {
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
         s/^\s+//; s/\s+$//;
+        s/\\protect\s*//g;  # Strip \protect for MathJax
         local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
             '\\begin{equation}', $_, '\\end{equation}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
@@ -1163,6 +1165,7 @@ sub do_env_displaymath {
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
         s/^\s+//; s/\s+$//;
+        s/\\protect\s*//g;  # Strip \protect for MathJax
         local($mathjax_content) = '<P></P><DIV CLASS="MATHDISPLAY">\\[' . $_ . '\\]</DIV><P></P>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
@@ -1208,6 +1211,7 @@ sub do_env_eqnarray {
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
         s/^\s+//; s/\s+$//;
+        s/\\protect\s*//g;  # Strip \protect for MathJax
         local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
             '\\begin{eqnarray}', $_, '\\end{eqnarray}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
@@ -1418,6 +1422,7 @@ sub do_env_eqnarraystar {
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
         s/^\s+//; s/\s+$//;
+        s/\\protect\s*//g;  # Strip \protect for MathJax
         local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
             '\\begin{eqnarray*}', $_, '\\end{eqnarray*}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
