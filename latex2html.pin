@@ -7248,8 +7248,8 @@ sub mathjax_script {
 
 sub mathjax_macros_js {
     # Generate JavaScript for MathJax macro definitions
-    # Default macros for common LaTeX commands
-    my %default_macros = (
+    # Simple macros (no arguments) - value is the replacement text
+    my %simple_macros = (
         # Definition symbols (isdef = "is defined as" with triangle)
         'isdef'     => '\\mathrel{\\stackrel{\\mathrm{\\Delta}}{=}}',
         'isdefs'    => '\\;\\isdef\\;',
@@ -7262,21 +7262,46 @@ sub mathjax_macros_js {
         'approxs'   => '\\,\\;\\approx\\;\\,',
     );
 
+    # Macros with arguments - value is [replacement, num_args]
+    # In MathJax: macro: ['replacement with #1', numArgs]
+    my %arg_macros = (
+        # Text formatting commands (for use in math mode)
+        'emph'      => ['\\textit{#1}', 1],
+        'textbf'    => ['\\mathbf{\\text{#1}}', 1],
+        # Box commands
+        'zbox'      => ['\\boxed{#1}', 1],
+        'fbox'      => ['\\boxed{#1}', 1],
+    );
+
     # Merge with user-defined macros (user macros override defaults)
     if (%MATHJAX_MACROS) {
         foreach my $key (keys %MATHJAX_MACROS) {
-            $default_macros{$key} = $MATHJAX_MACROS{$key};
+            my $val = $MATHJAX_MACROS{$key};
+            if (ref($val) eq 'ARRAY') {
+                $arg_macros{$key} = $val;
+            } else {
+                $simple_macros{$key} = $val;
+            }
         }
     }
 
     # Convert to JavaScript object notation
     my @macro_lines;
-    foreach my $name (sort keys %default_macros) {
-        my $def = $default_macros{$name};
-        # Escape backslashes for JavaScript string
-        $def =~ s/\\/\\\\/g;
+
+    # Simple macros: name: 'replacement'
+    foreach my $name (sort keys %simple_macros) {
+        my $def = $simple_macros{$name};
+        $def =~ s/\\/\\\\/g;  # Escape backslashes for JavaScript
         push @macro_lines, "      $name: '$def'";
     }
+
+    # Macros with arguments: name: ['replacement', numArgs]
+    foreach my $name (sort keys %arg_macros) {
+        my ($def, $nargs) = @{$arg_macros{$name}};
+        $def =~ s/\\/\\\\/g;  # Escape backslashes for JavaScript
+        push @macro_lines, "      $name: ['$def', $nargs]";
+    }
+
     return join(",\n", @macro_lines);
 }
 
