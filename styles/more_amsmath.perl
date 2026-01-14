@@ -33,8 +33,10 @@ sub mathjax_display_env {
     local($labels);
     ($_,$labels) = &extract_labels($_);
     $_ = &revert_to_raw_tex($_);
+    s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
     s/^\s+//; s/\s+$//;
     s/\\protect\s*//g;  # Strip \protect for MathJax
+    $_ = &escape_html_for_mathjax($_);
     # Store in verbatim hash to protect from further processing
     local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
         "\\begin{$envname}", $_, "\\end{$envname}", '</DIV><P></P>');
@@ -49,8 +51,10 @@ sub mathjax_display_env_with_arg {
     local($labels);
     ($_,$labels) = &extract_labels($_);
     $_ = &revert_to_raw_tex($_);
+    s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
     s/^\s+//; s/\s+$//;
     s/\\protect\s*//g;  # Strip \protect for MathJax
+    $_ = &escape_html_for_mathjax($_);
     local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
         "\\begin{$envname}{$arg}", $_, "\\end{$envname}", '</DIV><P></P>');
     $global{'verbatim_counter'}++;

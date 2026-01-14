@@ -50,8 +50,10 @@ sub do_env_math {
         local($labels);
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
+        s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
         s/^\s+//; s/\s+$//;
         s/\\protect\s*//g;  # Strip \protect for MathJax
+        $_ = &escape_html_for_mathjax($_);
         local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
@@ -100,8 +102,10 @@ sub do_env_tex2html_wrap {
         s/^$math_start_rx|${math_end_rx}$//g;
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
+        s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
         s/^\s+//; s/\s+$//;
         s/\\protect\s*//g;  # Strip \protect for MathJax
+        $_ = &escape_html_for_mathjax($_);
         local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
@@ -147,8 +151,10 @@ sub do_env_tex2html_wrap_inline {
         s/^\\ensuremath(($O|$OP)\d+($C|$CP))(.*)\1/$4/;
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
+        s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
         s/^\s+//; s/\s+$//;
         s/\\protect\s*//g;  # Strip \protect for MathJax
+        $_ = &escape_html_for_mathjax($_);
         local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
@@ -205,8 +211,10 @@ sub do_env_equation {
         local($labels);
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
+        s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
         s/^\s+//; s/\s+$//;
         s/\\protect\s*//g;  # Strip \protect for MathJax
+        $_ = &escape_html_for_mathjax($_);
         local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
             '\\begin{equation}', $_, '\\end{equation}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
@@ -328,8 +336,10 @@ sub do_env_displaymath {
         local($labels);
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
+        s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
         s/^\s+//; s/\s+$//;
         s/\\protect\s*//g;  # Strip \protect for MathJax
+        $_ = &escape_html_for_mathjax($_);
         local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
             '\\[', $_, '\\]', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
@@ -1019,8 +1029,10 @@ sub do_env_eqnarray {
         local($labels);
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
+        s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
         s/^\s+//; s/\s+$//;
         s/\\protect\s*//g;  # Strip \protect for MathJax
+        $_ = &escape_html_for_mathjax($_);
         local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
             '\\begin{eqnarray}', $_, '\\end{eqnarray}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
@@ -1222,8 +1234,10 @@ sub do_env_eqnarraystar {
         local($labels);
         ($_,$labels) = &extract_labels($_);
         $_ = &revert_to_raw_tex($_);
+        s/(?<!\\)%.*//g;    # Strip LaTeX comments (MathJax sees single line)
         s/^\s+//; s/\s+$//;
         s/\\protect\s*//g;  # Strip \protect for MathJax
+        $_ = &escape_html_for_mathjax($_);
         local($mathjax_content) = join('', '<P></P><DIV CLASS="MATHDISPLAY">',
             '\\begin{eqnarray*}', $_, '\\end{eqnarray*}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
