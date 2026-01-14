@@ -9827,6 +9827,16 @@ sub revert_to_raw_tex {
     $_;
 }
 
+# Escape < and > as HTML entities for MathJax content.
+# MathJax runs after the browser parses HTML, so literal < and > in math
+# (e.g., from \left< and \right>) get interpreted as HTML tags.
+sub escape_html_for_mathjax {
+    local($_) = @_;
+    s/</&lt;/g;
+    s/>/&gt;/g;
+    $_;
+}
+
 sub next_wrapper {
     local($dollar) = @_;
     local($_,$id);
