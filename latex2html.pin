@@ -7271,6 +7271,11 @@ sub mathjax_macros_js {
         # Box commands
         'zbox'      => ['\\boxed{#1}', 1],
         'fbox'      => ['\\boxed{#1}', 1],
+        # Complex number notation (use \\lbrace/\\rbrace to avoid delimiter issues)
+        'realPart'   => ['\\text{re}\\left\\lbrace #1 \\right\\rbrace', 1],
+        'realPartSq' => ['\\text{re}^2\\left\\lbrace #1 \\right\\rbrace', 1],
+        'imagPart'   => ['\\text{im}\\left\\lbrace #1 \\right\\rbrace', 1],
+        'imagPartSq' => ['\\text{im}^2\\left\\lbrace #1 \\right\\rbrace', 1],
     );
 
     # Merge with user-defined macros (user macros override defaults)
