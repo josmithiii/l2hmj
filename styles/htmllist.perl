@@ -96,7 +96,6 @@ sub do_env_htmllist{
     local($imagemark,$mark,$item_len,$desc_len,$mark_len,$mark_size);
     $imagemark = &set_htmllist_marker($bullet) if ($bullet);
 
-    $* = 1;
     local($Maxlength) = 99999;
     local($i,@items_done);
     print "[";
@@ -136,7 +135,6 @@ sub do_env_htmllist{
 		$_=$';
 	}
     }
-    $* = 0;
     $_ = join('',@items_done, $_); undef @items_done;
 
     #RRM: cannot have anything before the first <LI>
@@ -148,7 +146,7 @@ sub do_env_htmllist{
 	$preitems =~ s/<P( [^>]*)?>//g;
 	$preitems = "\n".$preitems if $preitems;
     }
-    $/ = $savedRS; $* = 0;	# Multiline matching OFF
+    $/ = $savedRS;
 
     $_ = '<DT>'.$_ unless (/^\s*<D(D|T)/);
     print "]";

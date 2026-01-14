@@ -121,7 +121,7 @@ sub convert_to_webtex {
     if($WEBEQ_IMG_ONLY) { return (1,$no_applet) };
 
     local($savedRS, $failed, $env_id, $_) = ($/,'','',$orig);
-    $/=''; $* = 1;
+    $/='';
     if ($mode =~ /inline/) {
 	if (/^\s*\\\(/) { $failed = 1 }
 	else {
@@ -140,10 +140,10 @@ sub convert_to_webtex {
 	}
     } else {
 	print " *** Unknown WebTeX mode, no applet ***";
-	$/ = $savedRS; $* = 0;
+	$/ = $savedRS;
 	return (0,$no_applet)
     }
-    $/ = $savedRS; $* = 0;
+    $/ = $savedRS;
     return (0,$no_applet) if $failed;
 
     ($failed,$_) = &check_only_webtex($_);
@@ -324,7 +324,7 @@ sub cleanup_mml_attribs {
     local($mml_code) = join('',<MML>);
     close MML;
 
-    local($savedRS) = $/; $*=0; $/='';
+    local($savedRS) = $/; $/='';
     $mml_code =~ s/^\s*<P><CENTER>\n?//s;
     $mml_code =~ s/\s*<applet code="[^"]*" width=(\d+) height=(\d+) align=(\w+)>\s*/
 	$width=$1;$height=$2;$align=$3;''/e;

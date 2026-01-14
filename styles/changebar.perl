@@ -126,11 +126,11 @@ sub do_env_changebar {
     $_ = &translate_environments($_);
 
     # multiple ends of change-bars have icons on the same line.
-    $* = 1; local($saveRS) = $/; undef $/;
+    local($saveRS) = $/; undef $/;
     s/(($endstr[^<]*<\/$cbstyle>)\s*<BR>(<<\d+>>($cbversion_rx)?)?\s*$)/
-	if ($`) {$1} else { $endcb = 0; $2.$3 }/eg;
-    s/($cbend_rx\s*$)/ if ($`) { $1 } else { $endcb = 0; $2.$4 }/eg;
-    $* = 0; $/ = $saveRS;
+	if ($`) {$1} else { $endcb = 0; $2.$3 }/egm;
+    s/($cbend_rx\s*$)/ if ($`) { $1 } else { $endcb = 0; $2.$4 }/egm;
+    $/ = $saveRS;
 
 
     if ($this_version) {

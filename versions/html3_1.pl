@@ -78,7 +78,7 @@ sub do_env_tex2html_wrap {
     local($attribs, $border);
     if (s/$htmlborder_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
     elsif (s/$htmlborder_pr_rx//o) { $attribs = $2; $border = (($4)? "$4" : 1) }
-    $* = 1; s/^\s*|\s*$//g; $*=0;
+    s/^\s*|\s*$//gm;
     local($saved) = $_;
 #   if (s/^\\\(|^\$|^\\math|\\\)$|\$$|\\endmath//g) {}
     if (s/^$math_start_rx|${math_end_rx}$//g) {}
@@ -161,7 +161,6 @@ sub do_env_equation {
     local($seqno) = join('',"\n<TD$eqno_class WIDTH=10 ALIGN=\""
                          , (($EQN_TAGS =~ /L/)? 'LEFT': 'RIGHT')
 		         , "\">\n");
-    $* = 1;
     do { # include the equation number, using a <TABLE>
 	$global{'eqn_number'}++;
 	$eqno = join('', $EQNO_START
@@ -177,7 +176,6 @@ sub do_env_equation {
 	else { $eqno = join('',$EQNO_START, $2, $EQNO_END ) }
 	$_ = $before;
     }
-    $* = 0;
 
     local($halign) = " ALIGN=\"CENTER\"" unless $FLUSH_EQN;
     if ($EQN_TAGS =~ /L/) {
@@ -352,8 +350,8 @@ sub make_math {
     s/\&limits;/\\limits/g;
 
     # remove white space at the extremities
-#   do{ $*=1; s/(^\s+|\s+$)//; $*=0; } unless ($NO_SIMPLE_MATH);
-    $*=1; s/^\s//o;s/\s$//; $*=0;
+#   do{ s/(^\s+|\s+$)//m; } unless ($NO_SIMPLE_MATH);
+    s/^\s//om; s/\s$//m;
 
     $_;
 }
@@ -970,7 +968,7 @@ sub do_env_eqnarray {
 
 	    if (s/\\lefteqn//) {
 		$return .= "\"LEFT\" COLSPAN=\"3\">";
-		$* =1; s/(^\s*|$html_specials{'&'}|\s*$)//g; $*=0;
+		s/(^\s*|$html_specials{'&'}|\s*$)//gm;
 		if (($doimage)||($failed)) {
 		    $_ = (($_)? &process_math_in_latex(
 			"indisplay" , '', '', $doimage.$_ ):'');
@@ -989,7 +987,7 @@ sub do_env_eqnarray {
 
 	    # left column, set using \displaystyle
 	    $thismath = shift(@cols); 
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+	    $thismath =~ s/(^\s*|\s*$)//gm;
 	    if (($doimage)||($failed)) {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , '', '', $doimage.$thismath ):'');
@@ -1006,7 +1004,7 @@ sub do_env_eqnarray {
 	    $thismath = shift(@cols);
 	    if (!($#cols < 0)) {
 #print "\nEQNARRAY:$#cols : $thismath";
-		$* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+		$thismath =~ s/(^\s*|\s*$)//gm;
 		if (($doimage)||($failed)) {
 		    $thismath = (($thismath ne '')? &process_math_in_latex(
 			"indisplay" , 'text', '', $doimage.$thismath ):'');
@@ -1026,7 +1024,7 @@ sub do_env_eqnarray {
 		&write_warnings($eqnarray_warning);
 		print "\n\n *** $eqnarray_warning \n";
 	    }
-	    $* =1; $thismath =~ s/(^\s*|\s*$)//g; $*=0;
+	    $thismath =~ s/(^\s*|\s*$)//gm;
 	    if (($doimage)||($failed)) {
 		$thismath = (($thismath ne '')? &process_math_in_latex(
 		    "indisplay" , '', '', $doimage.$thismath ):'');
@@ -1385,7 +1383,7 @@ sub translate_math_commands {
     	}
 
 	($pre_text,$labels) = &extract_labels($pre_text);
-	local($savedRS) = $/; $/ = ''; $* = 1;
+	local($savedRS) = $/; $/ = '';
 #	if ($pre_text =~ m/^((.|\n)*)\\begin\s*(($O|$OP)\d+($C|$CP))$ams_aligned_envs_rx\3/m) {
 	if ($pre_text =~ m/^()\\begin\s*(($O|$OP)\d+($C|$CP))$ams_aligned_envs_rx\3/m) {
 	    local($env,$star,$orig,$cnt) = ($7,$8,$pre_text.$_,1);
@@ -1403,7 +1401,7 @@ sub translate_math_commands {
 		    $cnt--; $pre_text .= $this_env if ($cnt > 0) ;
 		}
 	    }
-	    $* = 0; $/ = $savedRS;
+	    $/ = $savedRS;
 	    $env .= 'star' if $star;
 	    local($env_cmd) = 'do_env_'.$env;
 	    # parse it further, when possible...
@@ -1430,7 +1428,7 @@ sub translate_math_commands {
 	    $pre_text = &process_math_in_latex($mode,$style,$slevel,$pre_text)
 		if ($pre_text);
 	}
-	$* = 0; $/ = $savedRS;
+	$/ = $savedRS;
 	return($labels . $pre_text) unless ($_);
 
 	local($post_text, $this_text, $which_text);
@@ -1494,7 +1492,7 @@ sub make_math_comment{
 	$ecomm = "\n\\end{$env}";
     } unless ($env =~/tex2html/);
     $_ = &revert_to_raw_tex;
-    $* = 1; s/^\s+//; s/\s+$//; $* = 0;
+    s/^\s+//m; s/\s+$//m;
     $_ = $scomm . $_ . $ecomm;
     return() if (length($_) < 12);
     $global{'verbatim_counter'}++;
@@ -1637,7 +1635,6 @@ sub parse_math_toks {
 	        local ($saved) = $_;
 	        $_ = $';
 	        # find the \end, including nested environments of same type.
-	        $* = 1;
 	        local($cnt, $thisbit, $which) = (1,'','');
 	        while ( /\\(begin|end)(<#\d+#>)($env|$array_env_rx)(\*|star)?\2/s ) {
 		   $thisbit = $` . $&; $_ = $'; $which = $1;
@@ -1650,7 +1647,6 @@ sub parse_math_toks {
 	            if ($which =~ /begin/) {$cnt++} else {$cnt--};
 	            last if (!$cnt);
 	        }
-	        $* = 0;
 
 #		$this =~ s/\\cr(cr)?(\b|$|\d|\\|\W)/\\\\$2/g;
 	        local($env_cmd) = "do_env_$env".(($star)? "star" : '');
@@ -1667,12 +1663,10 @@ sub parse_math_toks {
 		    if (($in_array)||($extra)||($pre)||($keep)) {
 			$this .= $extra;
 			$this = &process_math_in_latex($mode,$style,$slevel,$this);
-		    } else { 
-			$*=1; 
+		    } else {
 			$star =~ s/\*/\\\*/o if ($star);
-			$this =~ s/^\\begin(<#\d+#>)$env$star\1//;
-			$this =~ s/\\end(<#\d+#>)$env$star\1\s*$//;
-			$*=0;
+			$this =~ s/^\\begin(<#\d+#>)$env$star\1//m;
+			$this =~ s/\\end(<#\d+#>)$env$star\1\s*$//m;
 			do {
 			    local($in_array) = 1;
 			    local($_) = $this;
@@ -2376,9 +2370,7 @@ sub get_supsub {
 	} elsif ($5) {
 	    $supsub .= $1; $which .= (($5 =~ /b/) ? '_' : '^');
 	    local($multisub_type) = $5;
-	    $* = 1;
-	    s/\\end(($O|$OP)\d+($C|$CP))$multisub_type\1/$supsub .= $`.$&;''/e;
-	    $* = 0;
+	    s/\\end(($O|$OP)\d+($C|$CP))$multisub_type\1/$supsub .= $`.$&;''/em;
 	} else { $supsub .= "\{^\\prime\}" }
     }
     # include dummy sup/sub-scripts to enhance the vertical spacing

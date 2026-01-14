@@ -50,7 +50,7 @@ sub preprocess_alltt {
     local ($before, $after, $alltt, $alltt_env);
     local ($alltt_begin) = "<alltt_begin>";
     local ($alltt_end) = "<alltt_end>";
-    local($saveRS) = $/; $*=1;undef $/;
+    local($saveRS) = $/; undef $/;
     while (/\\begin\s*{($alltt_rx)}([ \t]*\n)?/m) {
 	$alltt_env = $1;
 	$alltt = "";
