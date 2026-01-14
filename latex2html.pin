@@ -7272,10 +7272,14 @@ sub mathjax_macros_js {
         'zbox'      => ['\\boxed{#1}', 1],
         'fbox'      => ['\\boxed{#1}', 1],
         # Complex number notation (use \\lbrace/\\rbrace to avoid delimiter issues)
+        # CamelCase versions
         'realPart'   => ['\\text{re}\\left\\lbrace #1 \\right\\rbrace', 1],
         'realPartSq' => ['\\text{re}^2\\left\\lbrace #1 \\right\\rbrace', 1],
         'imagPart'   => ['\\text{im}\\left\\lbrace #1 \\right\\rbrace', 1],
         'imagPartSq' => ['\\text{im}^2\\left\\lbrace #1 \\right\\rbrace', 1],
+        # Lowercase versions
+        'realpart'   => ['\\text{re}\\left\\lbrace #1 \\right\\rbrace', 1],
+        'imagpart'   => ['\\text{im}\\left\\lbrace #1 \\right\\rbrace', 1],
     );
 
     # Merge with user-defined macros (user macros override defaults)
