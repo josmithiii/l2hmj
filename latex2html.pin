@@ -7316,55 +7316,6 @@ sub mathjax_macros_js {
     return join(",\n", @macro_lines);
 }
 
-# MathJax pass-through handlers
-# When MathJax is enabled, these macros should be passed through raw
-# so MathJax can process them with its own macro definitions.
-# This prevents latex2html from expanding them (which corrupts \{ to {).
-
-# Simple macros (no arguments) - just pass through the command name
-sub do_cmd_isdef {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\isdef " : "") . $_;
-}
-
-sub do_cmd_isdefs {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\isdefs " : "") . $_;
-}
-
-sub do_cmd_isdefss {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\isdefss " : "") . $_;
-}
-
-sub do_cmd_isdeftext {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\isdeftext " : "") . $_;
-}
-
-sub do_cmd_eqs {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\eqs " : "") . $_;
-}
-
-sub do_cmd_eqsp {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\eqsp " : "") . $_;
-}
-
-sub do_cmd_eqss {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\eqss " : "") . $_;
-}
-
-sub do_cmd_approxs {
-    local($_) = @_;
-    return ($USE_MATHJAX ? "\\approxs " : "") . $_;
-}
-
-# Hash of commands protected from newcommand expansion when MathJax is enabled.
-# For these commands, the built-in do_cmd_* handler takes priority over
-# any \newcommand definition from the LaTeX source.
 %mathjax_protected_cmds = (
     'realPart'   => 1,
     'realPartSq' => 1,
@@ -7383,93 +7334,133 @@ sub do_cmd_approxs {
     'approxs'    => 1,
 );
 
-# Macros with one argument
+# MathJax pass-through handlers
+# Use \@#\@\@ protection marker to prevent re-processing
+
+# Simple macros (no arguments)
+sub do_cmd_isdef {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@isdef " : "") . $_;
+}
+
+sub do_cmd_isdefs {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@isdefs " : "") . $_;
+}
+
+sub do_cmd_isdefss {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@isdefss " : "") . $_;
+}
+
+sub do_cmd_isdeftext {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@isdeftext " : "") . $_;
+}
+
+sub do_cmd_eqs {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@eqs " : "") . $_;
+}
+
+sub do_cmd_eqsp {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@eqsp " : "") . $_;
+}
+
+sub do_cmd_eqss {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@eqss " : "") . $_;
+}
+
+sub do_cmd_approxs {
+    local($_) = @_;
+    return ($USE_MATHJAX ? "\\\@#\@\@approxs " : "") . $_;
+}
+
+# Macros with one argument - extract arg and pass through with protection
 sub do_cmd_realPart {
     local($_) = @_;
-    print STDERR "\n*** do_cmd_realPart called, USE_MATHJAX=$USE_MATHJAX ***\n";
     if ($USE_MATHJAX) {
-        # Pass through raw for MathJax
-        my $arg;
-        $arg = &missing_braces unless (
-            (s/$next_pair_pr_rx/$arg = $2;''/eo)
-            ||(s/$next_pair_rx/$arg = $2;''/eo));
-        print STDERR "*** do_cmd_realPart returning \\realPart{$arg} ***\n";
-        return "\\realPart{$arg}" . $_;
+        my $arg = '';
+        s/$next_pair_pr_rx/$arg = $2;''/eo
+            || s/$next_pair_rx/$arg = $2;''/eo
+            || ($arg = &missing_braces);
+        return "\\\@#\@\@realPart{$arg}" . $_;
     }
-    # Fall back to default expansion if not MathJax mode
-    &process_undefined_environment("realPart", $_, '', 1);
+    $_;
 }
 
 sub do_cmd_imagPart {
     local($_) = @_;
     if ($USE_MATHJAX) {
-        my $arg;
-        $arg = &missing_braces unless (
-            (s/$next_pair_pr_rx/$arg = $2;''/eo)
-            ||(s/$next_pair_rx/$arg = $2;''/eo));
-        return "\\imagPart{$arg}" . $_;
+        my $arg = '';
+        s/$next_pair_pr_rx/$arg = $2;''/eo
+            || s/$next_pair_rx/$arg = $2;''/eo
+            || ($arg = &missing_braces);
+        return "\\\@#\@\@imagPart{$arg}" . $_;
     }
-    &process_undefined_environment("imagPart", $_, '', 1);
+    $_;
 }
 
 sub do_cmd_realpart {
     local($_) = @_;
     if ($USE_MATHJAX) {
-        my $arg;
-        $arg = &missing_braces unless (
-            (s/$next_pair_pr_rx/$arg = $2;''/eo)
-            ||(s/$next_pair_rx/$arg = $2;''/eo));
-        return "\\realpart{$arg}" . $_;
+        my $arg = '';
+        s/$next_pair_pr_rx/$arg = $2;''/eo
+            || s/$next_pair_rx/$arg = $2;''/eo
+            || ($arg = &missing_braces);
+        return "\\\@#\@\@realpart{$arg}" . $_;
     }
-    &process_undefined_environment("realpart", $_, '', 1);
+    $_;
 }
 
 sub do_cmd_imagpart {
     local($_) = @_;
     if ($USE_MATHJAX) {
-        my $arg;
-        $arg = &missing_braces unless (
-            (s/$next_pair_pr_rx/$arg = $2;''/eo)
-            ||(s/$next_pair_rx/$arg = $2;''/eo));
-        return "\\imagpart{$arg}" . $_;
+        my $arg = '';
+        s/$next_pair_pr_rx/$arg = $2;''/eo
+            || s/$next_pair_rx/$arg = $2;''/eo
+            || ($arg = &missing_braces);
+        return "\\\@#\@\@imagpart{$arg}" . $_;
     }
-    &process_undefined_environment("imagpart", $_, '', 1);
+    $_;
 }
 
 sub do_cmd_realPartSq {
     local($_) = @_;
     if ($USE_MATHJAX) {
-        my $arg;
-        $arg = &missing_braces unless (
-            (s/$next_pair_pr_rx/$arg = $2;''/eo)
-            ||(s/$next_pair_rx/$arg = $2;''/eo));
-        return "\\realPartSq{$arg}" . $_;
+        my $arg = '';
+        s/$next_pair_pr_rx/$arg = $2;''/eo
+            || s/$next_pair_rx/$arg = $2;''/eo
+            || ($arg = &missing_braces);
+        return "\\\@#\@\@realPartSq{$arg}" . $_;
     }
-    &process_undefined_environment("realPartSq", $_, '', 1);
+    $_;
 }
 
 sub do_cmd_imagPartSq {
     local($_) = @_;
     if ($USE_MATHJAX) {
-        my $arg;
-        $arg = &missing_braces unless (
-            (s/$next_pair_pr_rx/$arg = $2;''/eo)
-            ||(s/$next_pair_rx/$arg = $2;''/eo));
-        return "\\imagPartSq{$arg}" . $_;
+        my $arg = '';
+        s/$next_pair_pr_rx/$arg = $2;''/eo
+            || s/$next_pair_rx/$arg = $2;''/eo
+            || ($arg = &missing_braces);
+        return "\\\@#\@\@imagPartSq{$arg}" . $_;
     }
-    &process_undefined_environment("imagPartSq", $_, '', 1);
+    $_;
 }
 
 sub do_cmd_zbox {
     local($_) = @_;
     if ($USE_MATHJAX) {
-        my $arg;
-        $arg = &missing_braces unless (
-            (s/$next_pair_pr_rx/$arg = $2;''/eo)
-            ||(s/$next_pair_rx/$arg = $2;''/eo));
-        return "\\zbox{$arg}" . $_;
+        my $arg = '';
+        s/$next_pair_pr_rx/$arg = $2;''/eo
+            || s/$next_pair_rx/$arg = $2;''/eo
+            || ($arg = &missing_braces);
+        return "\\\@#\@\@zbox{$arg}" . $_;
     }
-    &process_undefined_environment("zbox", $_, '', 1);
+    $_;
 }
 
 sub style_sheet {
@@ -9972,13 +9963,6 @@ sub revert_to_raw_tex {
 	$character_map && eval
 	  "\$${character_map}_character_map_inv\{\$${character_map}_character_map{'$1'}}");
 		     $1/ego;
-
-    # Fix delimiters for MathJax: \left{ -> \left\{ and \right} -> \right\}
-    # These get corrupted when macros like \realPart expand \left\{ to \left{
-    if ($USE_MATHJAX) {
-        s/\\(left|right|bigl|bigr|Bigl|Bigr|biggl|biggr|Biggl|Biggr)\{/\\$1\\{/g;
-        s/\\(left|right|bigl|bigr|Bigl|Bigr|biggl|biggr|Biggl|Biggr)\}/\\$1\\}/g;
-    }
 
     &revert_to_raw_tex_hook if (defined &revert_to_raw_tex_hook);
     $_;
