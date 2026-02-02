@@ -7224,6 +7224,10 @@ sub mathjax_script {
     # Build macros section - combine default macros with user-defined ones
     my $macros_js = &mathjax_macros_js();
     my $script_content = join("\n",
+        '<!-- MathJax styling for better visibility of fraction lines -->',
+        '<style>',
+        'mjx-frac mjx-frac-line { border-top-width: 0.08em !important; }',
+        '</style>',
         '<script>',
         'MathJax = {',
         "  loader: {load: ['[tex]/textmacros']},",
