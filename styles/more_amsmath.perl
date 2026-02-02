@@ -42,7 +42,7 @@ sub mathjax_display_env {
         "\\begin{$envname}", $_, "\\end{$envname}", '</DIV><P></P>');
     $global{'verbatim_counter'}++;
     $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-    return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+    return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
 }
 
 # Helper for environments that take an argument, e.g., \begin{alignat}{2}
@@ -59,7 +59,7 @@ sub mathjax_display_env_with_arg {
         "\\begin{$envname}{$arg}", $_, "\\end{$envname}", '</DIV><P></P>');
     $global{'verbatim_counter'}++;
     $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-    return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+    return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
 }
 
 sub do_htmlmath_array {

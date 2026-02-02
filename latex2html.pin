@@ -8811,6 +8811,8 @@ sub replace_verbatim_marks {
     s/$verbatim_mark(imagesonly)(\d+)#//eg; # imagesonly is *not* replaced
     # Raw HTML, but replacements may have protected characters
     s/$verbatim_mark(rawhtml)(\d+)#/&unprotect_raw_html($verbatim{$2})/eg;
+    # MathJax content - do NOT unprotect (preserve \{ and \} for MathJax)
+    s/$verbatim_mark(mathjax)(\d+)#/$verbatim{$2}/eg;
     s/$verbatim_mark$keepcomments_rx(\d+)#/$verbatim{$2}/ego; # Raw TeX
     s/$unfinished_mark$keepcomments_rx(\d+)#/$verbatim{$2}/ego; # Raw TeX
 }
@@ -8834,7 +8836,7 @@ sub remove_verbatim_marks {
     s/($math_verbatim_rx|$mathend_verbatim_rx)//go;
 #    s/$verbatim_mark(verbatim\*?)(\d+)#//go;
     s/$verbatim_mark(\w*[Vv]erbatim\w*\*?)(\d+)#//go;
-    s/$verbatim_mark(rawhtml|imagesonly)(\d+)#//go;
+    s/$verbatim_mark(rawhtml|imagesonly|mathjax)(\d+)#//go;
     s/$verbatim_mark$keepcomments_rx(\d+)#//go;
     s/$unfinished_mark$keepcomments_rx(\d+)#//go;
 }
@@ -9674,6 +9676,10 @@ sub revert_to_raw_tex {
     # The same for processed markers ...
     while ( s/$OP\s*\d+\s*$CP/\{/o ) { s/$&/\}/; }
     while ( s/$OP\s*\d+\s*$CP/\{/o ) { s/$&/\}/;} #repeat this.
+
+    # restore escaped braces (for MathJax output)
+    s/tex2html_escaped_opening_bracket/\\{/go;
+    s/tex2html_escaped_closing_bracket/\\}/go;
 
     s/<BR>/\\\\/g; # restores the \\ from \parbox's
 

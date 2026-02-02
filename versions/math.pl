@@ -57,7 +57,7 @@ sub do_env_math {
         local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+        return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
     }
     local($math_mode, $failed, $labels, $comment,$img_params) = ("inline",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
@@ -109,7 +109,7 @@ sub do_env_tex2html_wrap {
         local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+        return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
     }
     local($math_mode, $failed, $labels, $comment,$img_params) = ("inline",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
@@ -158,7 +158,7 @@ sub do_env_tex2html_wrap_inline {
         local($mathjax_content) = '<SPAN CLASS="MATH">\\(' . $_ . '\\)</SPAN>';
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+        return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
     }
     local($math_mode, $failed, $labels, $comment) = ("inline",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
@@ -219,7 +219,7 @@ sub do_env_equation {
             '\\begin{equation}', $_, '\\end{equation}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+        return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
     }
     local($math_mode, $failed, $labels, $comment) = ("equation",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
@@ -344,7 +344,7 @@ sub do_env_displaymath {
             '\\[', $_, '\\]', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+        return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
     }
     local($math_mode, $failed, $labels, $comment) = ("display",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
@@ -1037,7 +1037,7 @@ sub do_env_eqnarray {
             '\\begin{eqnarray}', $_, '\\end{eqnarray}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+        return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
     }
     local($math_mode, $failed, $labels, $comment, $doimage) = ("equation",'','');
     local($attribs, $border);
@@ -1242,7 +1242,7 @@ sub do_env_eqnarraystar {
             '\\begin{eqnarray*}', $_, '\\end{eqnarray*}', '</DIV><P></P>');
         $global{'verbatim_counter'}++;
         $verbatim{$global{'verbatim_counter'}} = $mathjax_content;
-        return join('', $labels, $verbatim_mark, 'rawhtml', $global{'verbatim_counter'}, '#');
+        return join('', $labels, $verbatim_mark, 'mathjax', $global{'verbatim_counter'}, '#');
     }
     local($math_mode, $failed, $labels, $comment) = ("equation",'','');
     $failed = (/$htmlimage_rx|$htmlimage_pr_rx/); # force an image
