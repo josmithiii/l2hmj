@@ -7290,6 +7290,9 @@ sub mathjax_macros_js {
     foreach my $name (sort keys %simple_macros) {
         my $def = $simple_macros{$name};
         $def =~ s/\\/\\\\/g;  # Escape backslashes for JavaScript
+        $def =~ s/'/\\'/g;    # Escape single quotes for JavaScript
+        $def =~ s/\n/ /g;     # Collapse newlines (JS single-quoted strings)
+        $def =~ s/\t/ /g;     # Collapse tabs
         push @macro_lines, "      $name: '$def'";
     }
 
@@ -7297,6 +7300,9 @@ sub mathjax_macros_js {
     foreach my $name (sort keys %arg_macros) {
         my ($def, $nargs) = @{$arg_macros{$name}};
         $def =~ s/\\/\\\\/g;  # Escape backslashes for JavaScript
+        $def =~ s/'/\\'/g;    # Escape single quotes for JavaScript
+        $def =~ s/\n/ /g;     # Collapse newlines (JS single-quoted strings)
+        $def =~ s/\t/ /g;     # Collapse tabs
         push @macro_lines, "      $name: ['$def', $nargs]";
     }
 
