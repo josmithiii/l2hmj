@@ -7217,6 +7217,7 @@ sub make_head_and_body {
 	, ($BASE ? "<BASE HREF=\"$BASE\">" : "" )
 	, $STYLESHEET_CASCADE
 	, ($STYLESHEET ? "<LINK REL=\"STYLESHEET\" HREF=\"$STYLESHEET\">" : '' )
+	, ($EXTRA_STYLESHEET ? "<LINK REL=\"STYLESHEET\" HREF=\"$EXTRA_STYLESHEET\">" : '' )
 	, $more_links_mark
 	, "</HEAD>" , ($before_body? $before_body : '')
 	, "<BODY $body>", '');
