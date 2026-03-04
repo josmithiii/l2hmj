@@ -7175,13 +7175,18 @@ sub make_head_and_body {
 	$title = &custom_TITLE_hook($title, $toc_sec_title);
     }
 
-    if ($DOCTYPE =~ /\/\/[\w\.]+\s*$/) { # language spec included
+    # MathJax CHTML requires standards mode; HTML 3.2 triggers quirks mode
+    # in Chrome, causing fraction layout overlap.
+    if ($USE_MATHJAX) {
+	$DTDcomment = "<!DOCTYPE html>\n";
+    } elsif ($DOCTYPE =~ /\/\/[\w\.]+\s*$/) { # language spec included
 	$DTDcomment = '<!DOCTYPE HTML PUBLIC "'. $DOCTYPE .'"';
+	$DTDcomment .= ($PUBLIC_REF ? "\n  \"".$PUBLIC_REF.'"' : '' ) . '>'."\n";
     } else {
 	$DTDcomment = '<!DOCTYPE HTML PUBLIC "'. $DOCTYPE .'//'
-	    . ($ISO_LANGUAGE ? $ISO_LANGUAGE : $isolanguage) . '"'
+	    . ($ISO_LANGUAGE ? $ISO_LANGUAGE : $isolanguage) . '"';
+	$DTDcomment .= ($PUBLIC_REF ? "\n  \"".$PUBLIC_REF.'"' : '' ) . '>'."\n";
     }
-    $DTDcomment .= ($PUBLIC_REF ? "\n  \"".$PUBLIC_REF.'"' : '' ) . '>'."\n";
 
     $STYLESHEET = $FILE.".css" unless defined($STYLESHEET);
 
@@ -7220,7 +7225,7 @@ sub make_head_and_body {
 sub mathjax_script {
     # Generate MathJax configuration and loader script
     # Store in verbatim hash to protect from text_cleanup (which converts \, to space)
-    my $url = $MATHJAX_URL || 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+    my $url = $MATHJAX_URL || 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
     # Build macros section - combine default macros with user-defined ones
     my $macros_js = &mathjax_macros_js();
     my $script_content = join("\n",
@@ -7241,11 +7246,12 @@ sub mathjax_script {
         '  options: {',
         "    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']",
         '  },',
+        "  svg: {fontCache: 'global'},",
         '  startup: {',
         '    ready: function() {',
         '      MathJax.startup.defaultReady();',
         '      var style = document.createElement("style");',
-        '      style.textContent = "mjx-line { border-top: 0.12em solid var(--text-color, currentColor) !important; }";',
+        '      style.textContent = "mjx-container svg { color: var(--text-color, currentColor); }";',
         '      document.head.appendChild(style);',
         '    }',
         '  }',
