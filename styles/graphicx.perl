@@ -22,8 +22,20 @@ sub do_cmd_includegraphics {
   my $opt=x_next_optarg();   $opt =~ s/,/ /;
   my $op2=x_next_optarg();   $op2 =~ s/,/ /;
   my $file = x_next_arg();
-  do_includegraphics($file,
-     ($op2 ? "bb=$opt $op2" : ($opt ? "bb=0 0 $opt" : '')),
+  my $options;
+  if ($op2) {
+    # Two optional args: graphics.sty bounding box format [llx,lly][urx,ury]
+    $options = "bb=$opt $op2";
+  } elsif ($opt && $opt =~ /=/) {
+    # Key=value options: graphicx.sty format (width=..., scale=..., etc.)
+    $options = $opt;
+  } elsif ($opt) {
+    # Single numeric optional arg: bounding box upper-right corner
+    $options = "bb=0 0 $opt";
+  } else {
+    $options = '';
+  }
+  do_includegraphics($file, $options,
      "\\includegraphics".($opt && "[$opt]").($op2 && "[$op2]")."\{$file\}"); }
 
 sub do_cmd_includegraphicsstar {
@@ -31,8 +43,17 @@ sub do_cmd_includegraphicsstar {
   my $opt=x_next_optarg();  $opt =~ s/,/ /;
   my $op2=x_next_optarg();  $op2 =~ s/,/ /;
   my $file = x_next_arg();
-  do_includegraphics($file,
-     ($op2 ? "bb=$opt $op2, clip" : ($opt ? "bb=0 0 $opt, clip" : "clip")),
+  my $options;
+  if ($op2) {
+    $options = "bb=$opt $op2, clip";
+  } elsif ($opt && $opt =~ /=/) {
+    $options = "$opt, clip";
+  } elsif ($opt) {
+    $options = "bb=0 0 $opt, clip";
+  } else {
+    $options = "clip";
+  }
+  do_includegraphics($file, $options,
      "\\includegraphics*".($opt && "[$opt]").($op2 && "[$op2]")."\{$file\}"); }
 
 # ====================================================================== 

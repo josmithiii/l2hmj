@@ -3880,6 +3880,15 @@ sub make_off_line_images {
 		        L2hos->Rename("$TMPDIR$dd$_", "$TMPDIR$dd$_.ps");
 	        }
 	        closedir(DIR);
+		# Detect preamble page offset (same as make_images)
+		my $num_ps_files = scalar(@ALL_IMAGE_FILES);
+		my $num_image_entries = 0;
+		if (open(my $logfh, "<", ".$dd${PREFIX}images.log")) {
+		    while (<$logfh>) { ++$num_image_entries if /l2hSize/; }
+		    close($logfh);
+		}
+		$IMAGE_PAGE_OFFSET = $num_ps_files - $num_image_entries;
+		$IMAGE_PAGE_OFFSET = 0 if $IMAGE_PAGE_OFFSET < 0;
             } else {
                 print "\nError: Cannot read dir '$TMPDIR': $!\n";
             }
@@ -3980,6 +3989,20 @@ sub make_images {
 	        L2hos->Rename("$TMPDIR$dd$_", "$TMPDIR$dd$_.ps");
 	    }
 	    closedir(DIR);
+	    # Detect preamble page offset: dvips may generate extra blank
+	    # pages before the real image pages (e.g. from \onecolumn or
+	    # package specials at \begin{document} in images.tex).
+	    my $num_ps_files = scalar(@ALL_IMAGE_FILES);
+	    # Count expected image entries from the log file
+	    my $num_image_entries = 0;
+	    if (open(my $logfh, "<", ".$dd${PREFIX}images.log")) {
+		while (<$logfh>) { ++$num_image_entries if /l2hSize/; }
+		close($logfh);
+	    }
+	    $IMAGE_PAGE_OFFSET = $num_ps_files - $num_image_entries;
+	    $IMAGE_PAGE_OFFSET = 0 if $IMAGE_PAGE_OFFSET < 0;
+	    print "\n *** image page offset: $IMAGE_PAGE_OFFSET ($num_ps_files ps files, $num_image_entries entries) ***\n"
+		if ($IMAGE_PAGE_OFFSET && (($DEBUG)||($VERBOSITY > 1)));
         } else {
             print "\nError: Cannot read dir '$TMPDIR': $!\n";
         }
@@ -4029,7 +4052,7 @@ sub make_images {
     &write_warnings(
 		    "\nOne of the images is more than one page long.\n".
 		    "This may cause the rest of the images to get out of sync.\n\n")
-	if (-f sprintf("%s%.3d%s", $IMAGE_PREFIX, ++$new_page_num, ".ps"));
+	if (-f sprintf("%s%.3d%s", "$TMPDIR$dd$IMAGE_PREFIX", ++$new_page_num + ($IMAGE_PAGE_OFFSET || 0), ".ps"));
 #jos: dvips cannot do anything but three digits:
 #	if (-f sprintf("%s%.4d%s", $IMAGE_PREFIX, ++$new_page_num, ".ps"));
     print "\n *** no more images ***\n"  if ($VERBOSITY > 1);
@@ -4164,7 +4187,7 @@ sub extract_image { # clean
     $name =~ s/\*/star/;
     my ($env,$basename,$img) = ($name,"img$global_num",'');
     $env =~ s/\d+$//;
-    $psname = sprintf("%s%.3d", "$TMPDIR$dd$IMAGE_PREFIX", $new_num);
+    $psname = sprintf("%s%.3d", "$TMPDIR$dd$IMAGE_PREFIX", $new_num + ($IMAGE_PAGE_OFFSET || 0));
 #jos: dvips cannot do anything but three digits:
 #    $psname = sprintf("%s%.4d", "$TMPDIR$dd$IMAGE_PREFIX", $new_num);
     if ( $EXTERNAL_IMAGES && $PS_IMAGES ) {
