@@ -1,4 +1,4 @@
-#- -*- perl -*-
+#! /opt/local/bin/perl5.34
 #
 # $Id: latex2html.pin,v 1.2 2012/11/05 15:33:02 gildea Exp $
 #
@@ -70,25 +70,18 @@ use vars qw($LATEX2HTMLDIR $LATEX2HTMLPLATDIR $SCRIPT
             %Month %used_icons $inside_tabbing $TABLE_attribs
             %mathentities $date_name $outer_math $TABLE__CELLPADDING_rx);
 
-#- NOTE: This file contains a sort of preprocessor information, similar
-#- to C's #define statement, so please be careful when removing comments!
-#-
-#- The (texlive) wrapper sets these values
-#- or it is stored in the enviroment
-#-
-#unless @wrapper@ || @texlive@
 BEGIN {
   # print "scanning for l2hdir\n";
   if($ENV{'LATEX2HTMLDIR'}) {
     $LATEX2HTMLDIR = $ENV{'LATEX2HTMLDIR'};
   } else {
-    $ENV{'LATEX2HTMLDIR'} = $LATEX2HTMLDIR = '@LATEX2HTMLDIR@';
+    $ENV{'LATEX2HTMLDIR'} = $LATEX2HTMLDIR = '/usr/local/share/lib/latex2html';
   }
 
   if($ENV{'LATEX2HTMLPLATDIR'}) {
     $LATEX2HTMLPLATDIR = $ENV{'LATEX2HTMLPLATDIR'};
   } else {
-    $LATEX2HTMLPLATDIR = '@LATEX2HTMLPLATDIR@'||$LATEX2HTMLDIR;
+    $LATEX2HTMLPLATDIR = '/usr/local/lib/latex2html'||$LATEX2HTMLDIR;
     $ENV{'LATEX2HTMLPLATDIR'} = $LATEX2HTMLPLATDIR;
   }
   if(-d $LATEX2HTMLPLATDIR) {
@@ -101,13 +94,12 @@ BEGIN {
     die qq{Fatal: Directory "$LATEX2HTMLDIR" does not exist.\n};
   }
 }
-#fi
 
 use L2hos; # Operating system dependent routines
 
 # $^W = 1; # turn on warnings
 
-my $RELEASE = '@distver@';
+my $RELEASE = '2019';
 my ($REVISION) = q$Revision: 1.2 $ =~ /:\s*(\S+)/;
 
 # The key, which delimts expressions defined in the environment
@@ -140,7 +132,7 @@ if($ENV{'L2HCONFIG'}) {
 # MRO: Changed this to global value in config/config.pl
 # change these whenever you do a patch to this program and then
 # name the resulting patch file accordingly
-# $TVERSION = "@distver@";
+# $TVERSION = "2019";
 #$TPATCHLEVEL = " beta";
 #$TPATCHLEVEL = " release";
 #$RELDATE = "(March 30, 1999)";
@@ -170,15 +162,7 @@ unless(@ARGV) {
 }
 
 # Image prefix
-#if @texlive@
-$IMAGE_PREFIX = L2hos->plat() eq 'dos' ? 'ps' : '_image';
-#else
-  #if @plat@ eq 'dos'
-$IMAGE_PREFIX = 'ps';
-  #else
 $IMAGE_PREFIX = '_image';
-  #fi
-#fi - texlive
 
 # Partition prefix
 $PARTITION_PREFIX = 'part_' unless $PARTITION_PREFIX;
@@ -457,12 +441,12 @@ if ($opt{version}) {
 }
 if ($opt{test_mode}) {
     $TITLE = 'LaTeX2HTML Test Document';
-    $TEXEXPAND = "$PERL @srcdir@${dd}texexpand@scriptext@";
-    $PSTOIMG   = "$PERL @srcdir@${dd}pstoimg@scriptext@";
-    $ICONSERVER = L2hos->path2URL("@srcdir@${dd}icons");
+    $TEXEXPAND = "$PERL /l/l2h${dd}texexpand";
+    $PSTOIMG   = "$PERL /l/l2h${dd}pstoimg";
+    $ICONSERVER = L2hos->path2URL("/l/l2h${dd}icons");
     $TEST_MODE  = 1;
-    $RGBCOLORFILE = "@srcdir@${dd}styles${dd}rgb.txt";
-    $CRAYOLAFILE = "@srcdir@${dd}styles${dd}crayola.txt";
+    $RGBCOLORFILE = "/l/l2h${dd}styles${dd}rgb.txt";
+    $CRAYOLAFILE = "/l/l2h${dd}styles${dd}crayola.txt";
 }
 if($DEBUG) {
     # make the OS-dependent functions more chatty, too
@@ -471,11 +455,6 @@ if($DEBUG) {
 
 undef %opt; # not needed any more
 
-#unless @have_images@
-print "Warning: This system does not support generation of images\n"
-  unless($NO_IMAGES);
-$NO_IMAGES = 1;
-#fi
 
 $FIXEDDIR = $FIXEDDIR || $DESTDIR || '';  # for backward compatibility
 
@@ -638,12 +617,6 @@ exit 0; # clean exit, no errors
 sub make_tmp_dir {
     &close_dbm_database if $DJGPP; # to save file-handles
 
-#if @texlive@
-    $TMP = "$DESTDIR$dd$TMP_";
-    unless(-d $TMP) {
-        mkdir($TMP,0755);
-    }
-#fi
     # determine a suitable temporary path
     #
     $TMPDIR = '';
@@ -1125,7 +1098,6 @@ sub lost_argument {
     &write_warnings("\nincomplete argument to command: \\$cmd");
 }
 
-#-----------------------------------------------------------------------------
 
 # These subroutines should have been handled within the DBM database.
 # Unfortunately if the contents of an array are more than ~900 (system
@@ -1180,7 +1152,6 @@ sub read_mydb {
     $contents;
 }
 
-#-----------------------------------------------------------------------------
 
 # Reads in a latex generated file (e.g. .bbl or .aux)
 # It returns success or failure
@@ -9282,11 +9253,7 @@ sub usage {
 
     print (@_, "\n") if @_;
 
-#if @texlive@
-    my $perldoc = "perldoc";
-#else
-    my $perldoc = "@PERLSCRIPTDIR@${dd}perldoc";
-#fi
+    my $perldoc = "/opt/local/bin${dd}perldoc";
     my $script = $SCRIPT || $0;
     open(PIPE, "$perldoc -t $script |")
         || die "Fatal: can't open pipe: $!";
@@ -17707,7 +17674,7 @@ like specifying command line switches.
 =item LATEX2HTMLDIR
 
 Path where LaTeX2HTML library files are found. On this installation
-LATEX2HTMLDIR is F<@LATEX2HTMLDIR@>
+LATEX2HTMLDIR is F</usr/local/share/lib/latex2html>
 
 =item PERL5LIB
 

@@ -15,20 +15,20 @@ use vars qw(%used_icons);
 # On a unix system it may be best left empty, or set as in:
 # $PERL='/usr/local/bin/perl';
 #
-$PERL = '@PERL@';
+$PERL = '/opt/local/bin/perl5.34';
 
 # ############### THESE VARIABLES ARE DETERMINED BY CONFIGURE ################
 
 #  Give the paths to latex and dvips on your system:
 #
-$LATEX = '@LATEX@';	# LaTeX
-$DVIPS = '@DVIPS@';	# dvips
+$LATEX = '/opt/homebrew/bin/latex';	# LaTeX
+$DVIPS = '/opt/homebrew/bin/dvips';	# dvips
 
 
 #  give these too, to use the  -ldump  feature
 #
-$TEX = "@TEX@"; 			# TeX
-$INILATEX = "@INITEX@ \"&latex\"";	# initex+latex
+$TEX = "/opt/homebrew/bin/tex"; 			# TeX
+$INILATEX = "/opt/homebrew/bin/initex \"&latex\"";	# initex+latex
 
 
 # These affect whether images are made on a white or gray background.
@@ -49,18 +49,14 @@ $WHITE_BACKGROUND = 0;
 # This specifies the type of images produced by latex2html when processing
 # unknown environments and/or e.g. math formulae.
 #
-@IMAGE_TYPES = qw(@IMAGE_TYPES@);
+@IMAGE_TYPES = qw(png gif);
 $IMAGE_TYPE  = $IMAGE_TYPES[0];
 
 
 # -tmp
 # Specify a  tmp  directory for image-generation (optional)
 #
-#if @texlive@
-$TMP = $ENV{TMP} || $ENV{TEMP} || '.';
-#else
-$TMP = '@TMPSPACE@';
-#fi
+$TMP = '/tmp';
 
 
 #############  HTML validation  ###############
@@ -69,7 +65,7 @@ $TMP = '@TMPSPACE@';
 # the HTML pages produced;
 # use the  -validate  switch to run the validator, or set $HTML_VALIDATE
 #
-$HTML_VALIDATOR = '@HTML_VALIDATOR@';
+$HTML_VALIDATOR = '';
 
 
 # -validate
@@ -116,12 +112,7 @@ $HTML_VALIDATE = 0;
 #    In this case, customize &img_tag to use a central directory, say,
 #    "../icons".
 #
-#if @texlive@
-use L2hos;
-$ICONSERVER = L2hos->path2URL("$LATEX2HTMLDIR/icons");
-#else
-$ICONSERVER = '@ICONSERVER@'||'@ICONPATH@';
-#fi
+$ICONSERVER = ''||'file:/usr/local/share/lib/latex2html/icons';
 $ALTERNATIVE_ICONS = 0;
 
 
@@ -137,12 +128,12 @@ $DJGPP = 0;
 #  if you are having difficulties with inputs not being found,
 #  and your system is Web2C then setting this to 1 may help.
 #
-$Web2C = @WEB2C@;
+$Web2C = 1;
 
 
 # Options for dvips as determined by configure
 #
-$DVIPSOPT = '@DVIPSOPT@';
+$DVIPSOPT = '  -E';
 
 
 # If you already have the fonts, you may add -M to suppress font
@@ -211,20 +202,12 @@ $DVIPSOPT = '@DVIPSOPT@';
 
 # Location of texexpand, supplied with the translator
 #
-#if @texlive@
-$TEXEXPAND = "$PERL $LATEX2HTMLDIR/texexpand.pl";
-#else
-$TEXEXPAND = "$PERL @scriptdir@${dd}texexpand@scriptext@";
-#fi
+$TEXEXPAND = "$PERL /usr/local/bin${dd}texexpand";
 
 
 # Location of pstoimg, supplied with the translator
 #
-#if @texlive@
-$PSTOIMG = "$PERL $LATEX2HTMLDIR/pstoimg.pl";
-#else
-$PSTOIMG = "$PERL @scriptdir@${dd}pstoimg@scriptext@";
-#fi
+$PSTOIMG = "$PERL /usr/local/bin${dd}pstoimg";
 
 
 # This is used to "autoload" perl code to deal with specific style files
@@ -282,16 +265,7 @@ $ENV{'TEXINPUTS'} = $TEXINPUTS unless defined $ENV{'TEXINPUTS'};
 # If defined this will prevent the translator to crash if your operating
 # system does not support forking; e.g. DOS.
 #
-#if @texlive@
-# works only on UNIX, or...?
-$CAN_FORK = L2hos->plat() =~ /unix/;
-#else
-  #if @plat@ =~ /dos|win|os2/i
-$CAN_FORK = 0;
-  #else
 $CAN_FORK = 1;
-  #fi
-#fi
 
 
 # ############################################################################
@@ -537,11 +511,7 @@ $REUSE = 2;
 # When $NO_IMAGES is set LaTeX2HTML will not attempt to produce any inlined images
 # The missing images can be generated "off-line" by restarting LaTeX2HTML
 # after setting $IMAGES_ONLY (see below);
-#if @have_images@
 $NO_IMAGES = 0;
-#else
-$NO_IMAGES = 1;
-#fi
 
 
 # -images_only
@@ -673,11 +643,11 @@ $COLOR_HTML = 0;
 
 # the RGB colors database
 #
-$RGBCOLORFILE = '@RGBCOLORFILE@';
+$RGBCOLORFILE = '/usr/local/share/lib/latex2html/styles/rgb.txt';
 
 # the CMYK colors database
 #
-$CRAYOLAFILE = '@CRAYOLAFILE@';
+$CRAYOLAFILE = '/usr/local/share/lib/latex2html/styles/crayola.txt';
 
 ### End Colors ###
 
@@ -726,7 +696,7 @@ $DONT_INCLUDE = "2up:psfig:epsf:texinfo:pictex:" .
 #
 # Sidik Isani, <isani@cfht.hawaii.edu> added this.
 #
-$PK_GENERATION = 0; # @PK_GENERATION@ # by configure
+$PK_GENERATION = 0; # 0 # by configure
 
 
 #    ... and set the following variable ONLY if your version of dvips
@@ -735,7 +705,7 @@ $PK_GENERATION = 0; # @PK_GENERATION@ # by configure
 #  support this switch. If you do this, you do not need to modify .dvipsrc
 #  as described below. Herb Swan <dprhws@edp.Arco.com> added this.
 #
-$DVIPS_MODE = '@METAMODE@';
+$DVIPS_MODE = '';
 
 
 # Only if you have PK_GENERATION set to 1:
@@ -761,7 +731,7 @@ $DVIPS_MODE = '@METAMODE@';
 #   change this value though.  It *must* match the |pixels_per_inch| of
 #   the metafont mode (e.g. `toshiba').
 #
-$METAFONT_DPI = @METADPI@;
+$METAFONT_DPI = 0;
 
 
 # Controls which markup shows up between page and its foot.
@@ -884,54 +854,54 @@ $PAPERSIZE = "a5";
 # Thanks to Bruce Miller <bruce.miller@nist.gov> for revising support for
 # these packages, via the module  styles/graphics-support.perl 
 
-$PNMCUT = '@PNMCUT@';
-$PNMFLIP = '@PNMFLIP@';
-$PNMPAD = '@PNMPAD@';
-$PNMROTATE = '@PNMROTATE@';
-$PNMSCALE = '@PNMSCALE@';
+$PNMCUT = '/opt/local/bin/pnmcut';
+$PNMFLIP = '/opt/local/bin/pnmflip';
+$PNMPAD = '/opt/local/bin/pnmpad';
+$PNMROTATE = '/opt/local/bin/pnmrotate';
+$PNMSCALE = '/opt/local/bin/pnmscale';
 
-$GIFTOPNM = '@GIFTOPNM@';
-$JPEGTOPNM = '@JPEGTOPNM@';
-$PNGTOPNM = '@PNGTOPNM@';
-$PNMTOPNG = '@PNMTOPNG@';
-$PPMTOGIF = '@PPMTOGIF@';
-$PPMTOJPEG = '@PPMTOJPEG@';
+$GIFTOPNM = '/opt/local/bin/giftopnm';
+$JPEGTOPNM = '/opt/local/bin/jpegtopnm';
+$PNGTOPNM = '/opt/local/bin/pngtopnm';
+$PNMTOPNG = '/opt/local/bin/pnmtopng';
+$PPMTOGIF = '/opt/local/bin/ppmtogif';
+$PPMTOJPEG = '/opt/local/bin/ppmtojpeg';
 
 # there are for some lesser-used (platform-specific ?) graphics formats:
-$TIFFTOPNM = '@TIFFTOPNM@';
-$ANYTOPNM = '@ANYTOPNM@';
-$BMPTOPPM = '@BMPTOPPM@';
-$PCXTOPPM = '@PCXTOPPM@';
-$PICTTOPPM = '@PICTTOPPM@';
-$SGITOPNM = '@SGITOPNM@';
-$XBMTOPBM = '@XBMTOPBM@';
-$XWDTOPNM = '@XWDTOPNM@';
+$TIFFTOPNM = '/opt/local/bin/tifftopnm';
+$ANYTOPNM = '/opt/local/bin/anytopnm';
+$BMPTOPPM = '/opt/local/bin/bmptoppm';
+$PCXTOPPM = '/opt/local/bin/pcxtoppm';
+$PICTTOPPM = '/opt/local/bin/picttoppm';
+$SGITOPNM = '/opt/local/bin/sgitopnm';
+$XBMTOPBM = '/opt/local/bin/xbmtopbm';
+$XWDTOPNM = '/opt/local/bin/xwdtopnm';
 
 # uncomment these, and adjust  configure.in  to find the executable
-# $FIASCOTOPNM = @FIASCOTOPNM@;
-# $FITSTOPNM = @FITSTOPNM@;
-# $GEMTOPNM = @GEMTOPNM@;
-# $JBIGTOPNM = @JBIGTOPNM@;
-# $PALMTOPNM = @PALMTOPNM@;
-# $PAMTOPNM = @PAMTOPNM@;
-# $PSTOPNM = @PSTOPNM@;
-# $RASTTOPNM = @RASTTOPNM@;
-# $RLETOPNM = @RLETOPNM@;
-# $SIRTOPNM = @SIRTOPNM@;
-# $ZEISSTOPNM = @ZEISSTOPNM@;
+# $FIASCOTOPNM = ;
+# $FITSTOPNM = ;
+# $GEMTOPNM = ;
+# $JBIGTOPNM = ;
+# $PALMTOPNM = ;
+# $PAMTOPNM = ;
+# $PSTOPNM = ;
+# $RASTTOPNM = ;
+# $RLETOPNM = ;
+# $SIRTOPNM = ;
+# $ZEISSTOPNM = ;
 
-# $IMGTOPPM = @IMGTOPPM@;
-# $RGB3TOPPM = @RGB3TOPPM@;
-# $TGATOPPM = @TGATOPPM@;
-# $XIMTOPPM = @XIMTOPPM@;
-# $XPMTOPPM = @XPMTOPPM@;
-# $XVMINITOPPM = @XVMINITOPPM@;
-# $XVPICTOPPM = @XVPICTOPPM@;
-# $YUVTOPPM = @YUVTOPPM@;
+# $IMGTOPPM = ;
+# $RGB3TOPPM = ;
+# $TGATOPPM = ;
+# $XIMTOPPM = ;
+# $XPMTOPPM = ;
+# $XVMINITOPPM = ;
+# $XVPICTOPPM = ;
+# $YUVTOPPM = ;
 
-# $ICONTOPBM = @ICONTOPBM@;
-# $WBMTOPBM = @WBMTOPBM@;
-# $YBMTOPBM = @YBMTOPBM@;
+# $ICONTOPBM = ;
+# $WBMTOPBM = ;
+# $YBMTOPBM = ;
 
 #
 ### Internationalization ######################################################
