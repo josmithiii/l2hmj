@@ -3848,6 +3848,7 @@ sub make_latex_images{
     local($dd) = $dd; $dd = '/' if ($dd eq "\\");
     local($latex_call) = "$LATEX .$dd${PREFIX}images.tex";
     print "$latex_call\n" if (($DEBUG)||($VERBOSITY > 1));
+    print "DEBUG TEXINPUTS=$ENV{'TEXINPUTS'}\n" if ($DEBUG);
     L2hos->syswait($latex_call);
     &open_dbm_database if $DJGPP;
 }

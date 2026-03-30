@@ -1184,6 +1184,8 @@ EOF
     }
 
   my $gs_quiet = $opt{debug} ? '' : '-q -dNOPAUSE -dNO_PAUSE';
+  # Ghostscript 10.x+ defaults to -dSAFER which blocks file reads via (file) run
+  my $gs_safety = '-dNOSAFER';
 #if @texlive@
   my $out_redirect = ($NULLFILE && !$opt{debug}) ? "> $NULLFILE" : '';
 #else
@@ -1204,7 +1206,7 @@ EOF
   #fi
 #fi - texlive
   if($opt{debug}) {
-    print "$prompt: Running $GS $gs_quiet -sDEVICE=$GSDEVICE $gs_size $gs_density $gs_aalias $gs_out $out_redirect\n";
+    print "$prompt: Running $GS $gs_quiet $gs_safety -sDEVICE=$GSDEVICE $gs_size $gs_density $gs_aalias $gs_out $out_redirect\n";
 #if !@have_geometry@ && @PNMFLIP@ && @GSLANDSCAPE@
     print "GS>$GSROTATE\n" if($GSROTATE);
 #fi
@@ -1213,7 +1215,7 @@ EOF
     print "GS>showpage\n" if ($epsf);
     print "GS>quit\n";
     }
-  open (GS, "|$GS $gs_quiet -sDEVICE=$GSDEVICE $gs_size $gs_density $gs_aalias $gs_out $out_redirect");
+  open (GS, "|$GS $gs_quiet $gs_safety -sDEVICE=$GSDEVICE $gs_size $gs_density $gs_aalias $gs_out $out_redirect");
 #if !@have_geometry@ && @PNMFLIP@ && @GSLANDSCAPE@
   print GS "$GSROTATE\n" if ($GSROTATE);
 #fi
