@@ -581,7 +581,7 @@ $NO_SIMPLE_MATH = 0;
 $USE_MATHJAX = 1;
 
 # MathJax CDN URL (or path to local installation)
-$MATHJAX_URL = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+$MATHJAX_URL = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
 
 # Custom MathJax macro definitions
 # Add user-defined LaTeX macros here. These will be added to MathJax's configuration
