@@ -7223,9 +7223,9 @@ sub mathjax_config_block {
     my $macros_js = &mathjax_macros_js();
     return join("\n",
         'window.MathJax = {',
-        "  loader: {load: ['[tex]/textmacros']},",
+        "  loader: {load: ['[tex]/ams', '[tex]/textmacros']},",
         '  tex: {',
-        "    packages: {'[+]': ['textmacros']},",
+        "    packages: {'[+]': ['ams', 'textmacros']},",
         "    inlineMath: [['\\\\(', '\\\\)']],",
         "    displayMath: [['\\\\[', '\\\\]']],",
         '    processEscapes: false,',
