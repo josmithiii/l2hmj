@@ -1337,18 +1337,16 @@ sub crop_scale_etc {
       # MRO: this shouldn't be necessary: L2hos->Unlink($tmp);
       next; # go to next crop argument
     } # end switch on crop codes
-#if @pipes@
+    # Always run pnmcrop on a real (seekable) file, never via pipe.  Modern
+    # netpbm pnmcrop calls lseek() on stdin, and pipes are not seekable —
+    # this produces "Illegal seek" failures when one pnmcrop feeds another
+    # (observed on macOS).  Flush any in-progress pipe first, then run
+    # this pnmcrop standalone.  -- jos 2026
     if($cmd) {
-      # Continue command pipe
-      $cmd .= "| $PNMCROP $croparg";
-    } else {
-      # start new pipe
-      $cmd = "$PNMCROP $croparg< $in ";
+      &do_cmd($in,$tmp,$cmd) || return 0;
+      $cmd = '';
     }
-#else
-    # Do the crop
-    &do_cmd($in,$tmp,"$PNMCROP $croparg < $in") || return 0; # failure
-#fi
+    &do_cmd($in,$tmp,"$PNMCROP $croparg < $in") || return 0;
   } # end cropping
 
 #if !@have_geometry@ && @GSLANDSCAPE@ && @PNMFLIP@
