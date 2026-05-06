@@ -1,0 +1,9 @@
+\documentclass{article}
+\usepackage{html}
+% Collides with do_cmd_qsp (or any do_cmd_X handler an init file may
+% define for the same name). Renaming this to e.g. \qspX makes the
+% test pass under $STRICT_REDEFINE.
+\newcommand{\qsp}{ }
+\begin{document}
+foo\qsp bar
+\end{document}
