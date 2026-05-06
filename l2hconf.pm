@@ -854,28 +854,28 @@ $PAPERSIZE = "a5";
 # Thanks to Bruce Miller <bruce.miller@nist.gov> for revising support for
 # these packages, via the module  styles/graphics-support.perl 
 
-$PNMCUT = '/opt/local/bin/pnmcut';
-$PNMFLIP = '/opt/local/bin/pnmflip';
-$PNMPAD = '/opt/local/bin/pnmpad';
-$PNMROTATE = '/opt/local/bin/pnmrotate';
-$PNMSCALE = '/opt/local/bin/pnmscale';
+$PNMCUT = '/opt/homebrew/bin/pnmcut';
+$PNMFLIP = '/opt/homebrew/bin/pnmflip';
+$PNMPAD = '/opt/homebrew/bin/pnmpad';
+$PNMROTATE = '/opt/homebrew/bin/pnmrotate';
+$PNMSCALE = '/opt/homebrew/bin/pnmscale';
 
-$GIFTOPNM = '/opt/local/bin/giftopnm';
-$JPEGTOPNM = '/opt/local/bin/jpegtopnm';
-$PNGTOPNM = '/opt/local/bin/pngtopnm';
-$PNMTOPNG = '/opt/local/bin/pnmtopng';
-$PPMTOGIF = '/opt/local/bin/ppmtogif';
-$PPMTOJPEG = '/opt/local/bin/ppmtojpeg';
+$GIFTOPNM = '/opt/homebrew/bin/giftopnm';
+$JPEGTOPNM = '/opt/homebrew/bin/jpegtopnm';
+$PNGTOPNM = '/opt/homebrew/bin/pngtopnm';
+$PNMTOPNG = '/opt/homebrew/bin/pnmtopng';
+$PPMTOGIF = '/opt/homebrew/bin/ppmtogif';
+$PPMTOJPEG = '/opt/homebrew/bin/ppmtojpeg';
 
 # there are for some lesser-used (platform-specific ?) graphics formats:
-$TIFFTOPNM = '/opt/local/bin/tifftopnm';
-$ANYTOPNM = '/opt/local/bin/anytopnm';
-$BMPTOPPM = '/opt/local/bin/bmptoppm';
-$PCXTOPPM = '/opt/local/bin/pcxtoppm';
-$PICTTOPPM = '/opt/local/bin/picttoppm';
-$SGITOPNM = '/opt/local/bin/sgitopnm';
-$XBMTOPBM = '/opt/local/bin/xbmtopbm';
-$XWDTOPNM = '/opt/local/bin/xwdtopnm';
+$TIFFTOPNM = '/opt/homebrew/bin/tifftopnm';
+$ANYTOPNM = '/opt/homebrew/bin/anytopnm';
+$BMPTOPPM = '/opt/homebrew/bin/bmptoppm';
+$PCXTOPPM = '/opt/homebrew/bin/pcxtoppm';
+$PICTTOPPM = '/opt/homebrew/bin/picttoppm';
+$SGITOPNM = '/opt/homebrew/bin/sgitopnm';
+$XBMTOPBM = '/opt/homebrew/bin/xbmtopbm';
+$XWDTOPNM = '/opt/homebrew/bin/xwdtopnm';
 
 # uncomment these, and adjust  configure.in  to find the executable
 # $FIASCOTOPNM = ;
