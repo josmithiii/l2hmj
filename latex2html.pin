@@ -13428,6 +13428,15 @@ sub process_commands_inline_in_tex {
 	local($cmd, @args) = split('#',$_);
 	next unless $cmd;
 	$cmd =~ s/ //g;
+	# If an init file (e.g. a MathJax-aware setup) has already defined
+	# do_cmd_$cmd, leave the command alone so it dispatches through
+	# translate_commands / process_command to that handler.  Without
+	# this guard, the wrap_cmd_$cmd generated below intercepts first
+	# (via wrap_raw_arg_cmds), and the do_cmd_$cmd handler is dead code.
+	# This bites text-mode commands like \fbox whose contents may include
+	# constructs MathJax cannot parse (e.g. \begin{tabular}).
+	my $user_do = "do_cmd_$cmd";
+	next if (defined &$user_do);
 	# Build routine body ...
 	local ($body, $code, $thisone) = ("", "");
 
