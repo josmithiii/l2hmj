@@ -13538,8 +13538,25 @@ sub wrap_raw_arg_cmds {
 	    	&& (length($_) == length($after)+1) );
 	    push (@processed, $wrap);
 	} elsif ($raw_arg_cmds{$cmd}) {
-	    print STDERR "\n*** $wrapper not defined, cannot wrap \\$cmd";
-	    &write_warnings("\n*** $wrapper not defined, cannot wrap \\$cmd ");
+	    # Failing to wrap is harmless (not worth a warning) when a
+	    # downstream handler is known to process the command anyway:
+	    #  - do_cmd_$cmd from an init file (e.g. MathJax-aware setup);
+	    #  - a %MATHJAX_MACROS entry (MathJax expands it in-browser);
+	    #  - a recorded \newcommand/\renewcommand body in %new_command
+	    #    (translate_commands substitutes it).
+	    # NB: testing do_cmd_$cmd alone is not sufficient here --
+	    # write_string_out calls close_dbm_database just before
+	    # forking each partition child, and close_dbm_database
+	    # undefs do_cmd_* for every %renew_command key, so in
+	    # partition children only the latter two tests hold
+	    # (%MATHJAX_MACROS via fork inheritance, %new_command via
+	    # read_mydb in open_dbm_database).
+	    unless ((defined &{"do_cmd_$cmd"})
+		    || ($USE_MATHJAX && defined($MATHJAX_MACROS{$cmd}))
+		    || (defined($new_command{$cmd}))) {
+		print STDERR "\n*** $wrapper not defined, cannot wrap \\$cmd";
+		&write_warnings("\n*** $wrapper not defined, cannot wrap \\$cmd ");
+	    }
 	    push (@processed, "\\$cmd$padding");
 	    $_ = $after;
 	} else {
