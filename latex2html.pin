@@ -7279,11 +7279,19 @@ sub make_head_and_body {
 sub mathjax_config_block {
     # Return the MathJax configuration object lines (without outer <script> tags).
     my $macros_js = &mathjax_macros_js();
+    # TeX input extensions to preload.  Configurable via @MATHJAX_PACKAGES
+    # (see l2hconf.pm); relying on MathJax's `autoload` instead leaves
+    # commands such as \boldsymbol unexpanded (rendered in red) whenever the
+    # on-demand CDN fetch is slow or blocked.
+    my @pkgs = @MATHJAX_PACKAGES ? @MATHJAX_PACKAGES
+                                 : ('ams', 'textmacros', 'boldsymbol');
+    my $loader_list  = join(', ', map { "'[tex]/$_'" } @pkgs);
+    my $package_list = join(', ', map { "'$_'" } @pkgs);
     return join("\n",
         'window.MathJax = {',
-        "  loader: {load: ['[tex]/ams', '[tex]/textmacros']},",
+        "  loader: {load: [$loader_list]},",
         '  tex: {',
-        "    packages: {'[+]': ['ams', 'textmacros']},",
+        "    packages: {'[+]': [$package_list]},",
         "    inlineMath: [['\\\\(', '\\\\)']],",
         "    displayMath: [['\\\\[', '\\\\]']],",
         '    processEscapes: false,',

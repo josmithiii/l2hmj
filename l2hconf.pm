@@ -594,6 +594,21 @@ $MATHJAX_URL = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
 #   );
 %MATHJAX_MACROS = ();
 
+# MathJax TeX input extensions to preload (both in `loader.load` as
+# '[tex]/NAME' and in `tex.packages`).
+#
+# MathJax's `autoload` extension can fetch most of these on demand, but
+# autoload only fires when the command is seen, then aborts and re-runs the
+# expression after an async CDN fetch.  If that fetch is slow, blocked, or
+# the expression is typeset by code that does not await the retry, the
+# command is left unexpanded and MathJax renders it in red as literal text
+# (e.g. a red "\boldsymbol" where a bold symbol belongs).  Preloading the
+# extensions a document actually needs removes the race entirely.
+#
+# 'boldsymbol' is in the default list because JOS's math macros use
+# \boldsymbol heavily (\Zt, \Deltab, \Gamm, \Lamm, \deltab, \mybm, ...).
+@MATHJAX_PACKAGES = ('ams', 'textmacros', 'boldsymbol');
+
 # Write MathJax configuration to a shared external file (mathjax-config.js)
 # instead of inlining it in every HTML page.  The browser caches the file
 # across pages, so each page after the first pays zero parse cost for the
