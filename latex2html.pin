@@ -5832,6 +5832,45 @@ sub process_body_newcommand {
 
     $tmp = "do_cmd_$cmd";
     local($wtmp) = "wrap_cmd_$cmd";
+    # A document-level definition overrides an auto-generated MathJax
+    # pass-through handler (%mathjax_protected_cmds, installed by
+    # mathjax-macros.pl) when the two definitions genuinely DIFFER.
+    # The shared pass-through table is harvested from ALL jos-latex
+    # style files, so it can hold a macro (e.g. \xtt = \ddot x from
+    # wgtmac.tex) whose name a document that never loads that style
+    # file defines with another meaning (\xtt = \texttt{x} in the
+    # filters book).  Without this override the pass-through wins, the
+    # document's definition is discarded, and every text-mode use of
+    # the macro is silently dropped from the HTML output (empty
+    # <DT></DT> terms, missing words).  When the body matches the
+    # harvested raw body (%mathjax_macro_rawbody) the macro comes from
+    # a loaded, harvested style file: keep the pass-through, so math
+    # stays raw for MathJax and renders from the config as before.
+    if ($mathjax_protected_cmds{$cmd} && ((defined &$tmp)||(defined &$wtmp))) {
+	local($docbody) = &revert_to_raw_tex("$body");
+	local($mjraw) = $mathjax_macro_rawbody{$cmd};
+	$mjraw = '' unless (defined $mjraw);
+	foreach ($docbody, $mjraw) { s/\s+/ /g; s/^ //; s/ $//; }
+	if ($docbody ne $mjraw) {
+	    print "\n*** document definition of \\$cmd overrides MathJax pass-through ***\n";
+	    &write_warnings("\ndocument definition of \\$cmd overrides MathJax pass-through");
+	    eval "undef \&$tmp" if (defined &$tmp);
+	    eval "undef \&$wtmp" if (defined &$wtmp);
+	    delete $mathjax_protected_cmds{$cmd};
+	    if ($USE_MATHJAX && defined $MATHJAX_MACROS{$cmd}) {
+		# Keep MathJax consistent with the document: any \cmd
+		# that still reaches MathJax raw must render with the
+		# document's definition (best-effort text->math forms).
+		local($mjdef) = $docbody;
+		$mjdef =~ s/\\texttt\s*\{/\\text{/g;
+		$mjdef =~ s/\\textbf\s*\{/\\mathbf{/g;
+		$mjdef =~ s/\\textit\s*\{/\\mathit{/g;
+		$mjdef =~ s/\\textrm\s*\{/\\mathrm{/g;
+		$mjdef =~ s/\\textsc\s*\{/\\text{/g;
+		$MATHJAX_MACROS{$cmd} = ($argn ? [$mjdef, $argn] : $mjdef);
+	    }
+	}
+    }
     if ((defined &$tmp)||(defined &$wtmp)){
 	# command already exists, so \providecommand  does nothing
 	# but may still be needed in  images.tex
