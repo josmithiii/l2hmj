@@ -17118,9 +17118,21 @@ sub make_new_cmd_rx {
 	&escape_rx_chars(join($CD, grep(/[$letters]/,@_)));
 
     if (%renew_command) {
-	local($renew);
+	# Drop each renewed command from the alternation, matching the
+	# name WHOLE (delimited by $CD or end of string).  The old
+	#     s/(^|$CD)$renew//
+	# removed the first occurrence of the name as a PREFIX: with \xv
+	# in %renew_command (a MathJax pass-through that the document
+	# re-declares) it could eat the "xv" of "xvnu", leaving "nu" in
+	# the list, dropping \xvnu from it and keeping \xv.  \xvnu was
+	# then never substituted in running text and reached MathJax raw
+	# (red "\xvnu" in the browser; likewise \avt from \av), while
+	# \nu silently became a "new command".  Which names were mangled
+	# depended on hash order, so the symptom moved between builds.
+	local($renew, $renew_rx);
 	foreach $renew (keys %renew_command) {
-	    $lettercmds =~ s/(^|$CD)$renew//; }
+	    $renew_rx = &escape_rx_chars($renew);
+	    $lettercmds =~ s/(^|$CD)$renew_rx(?=$CD|$)//; }
         $lettercmds =~ s/^$CD$//;
     }
 

@@ -1,0 +1,46 @@
+\documentclass{article}
+\usepackage{html}
+% Regression test for make_new_cmd_rx (see renew_prefix_test.sh).
+%
+% Each pair below is (RENEWED, VICTIM): the init file defines a perl
+% do_cmd_RENEWED handler, so the \newcommand{\RENEWED} here lands in
+% %renew_command, and VICTIM's name starts with RENEWED's name.  The old
+% code removed renewed names from the new-command alternation with
+%     s/(^|$CD)$renew//
+% i.e. as a PREFIX of the first matching entry, so depending on hash
+% order it turned "xvnu" into "nu" and left \xvnu unsubstituted.
+%
+% The victims are used in MATH: with $USE_MATHJAX the math body is emitted
+% as raw TeX without a translate_commands pass, so the regex-driven
+% substitution in substitute_meta_cmds is the only chance to expand them
+% (in running text, process_command later rescues them by name).  Each is
+% followed by "_": the buggy regex is the one &tokenize uses to put the
+% delimiter after a command name, and a victim followed by a space or by
+% ^ ( , was still picked up by the substitution pass, while \xvnu_0 was
+% left raw (exactly the mdft symptom).
+\newcommand{\xv}{XV}
+\newcommand{\xvnu}{XVNU-OK}
+\newcommand{\av}{AV}
+\newcommand{\avt}{AVT-OK}
+\newcommand{\bv}{BV}
+\newcommand{\bvq}{BVQ-OK}
+\newcommand{\cv}{CV}
+\newcommand{\cvr}{CVR-OK}
+\newcommand{\dv}{DV}
+\newcommand{\dvs}{DVS-OK}
+\newcommand{\ev}{EV}
+\newcommand{\evt}{EVT-OK}
+\newcommand{\fv}{FV}
+\newcommand{\fvu}{FVU-OK}
+\newcommand{\gv}{GV}
+\newcommand{\gvw}{GVW-OK}
+\newcommand{\hv}{HV}
+\newcommand{\hvx}{HVX-OK}
+\newcommand{\kv}{KV}
+\newcommand{\kvy}{KVY-OK}
+\begin{document}
+\section{Renewed-prefix test}
+Display:
+\[ \xvnu_0 + \avt_0 + \bvq_0 + \cvr_0 + \dvs_0 \]
+Inline: $\evt_0 + \fvu_0 + \gvw_0 + \hvx_0 + \kvy_0$.
+\end{document}
