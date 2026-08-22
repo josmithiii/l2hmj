@@ -1844,6 +1844,18 @@ sub write_string_out {
     # All open unflushed streams are inherited by the child. If this is
     # not set then the parent will *not* wait
     $| = 1;
+    # Every partition after the one holding \begin{document} is pure
+    # document body.  Note that here, in the parent, so the flag is
+    # inherited by each later forked child: substitute_meta_cmds starts
+    # a partition with $within_preamble = 1 ($PREAMBLE is still 2 while
+    # the input is being read) and otherwise clears it only on meeting
+    # \begin{document}, which later partitions (one per \input'ed file,
+    # see the INCLUDED FILE MARKER loop) never contain -- so every
+    # \providecommand-defined macro used in them was "left alone" and
+    # reached the output raw (e.g. \mr, \mrr in the filters book, whose
+    # trig.tex arrives via \input, rendering as red text under MathJax).
+    local($has_begin_doc) =
+	($string{'STRING'} =~ /\\(begin\s*\{\s*document\s*\}|startdocument)/);
     # fork returns 0 to the child and PID to the parent
     &write_mydb_simple("prelatex", $prelatex);
     &close_dbm_database;
@@ -1863,6 +1875,7 @@ sub write_string_out {
 	    exit($? >> 8 || 1);
 	}
     }
+    $PARTITION_PAST_PREAMBLE = 1 if ($has_begin_doc);
     &open_dbm_database;
 }
 
@@ -5332,7 +5345,10 @@ sub substitute_meta_cmds {
 	# speed-up processing of long files by splitting into smaller segments
 	# but don't split within the preamble, else \newenvironment may break
 	local($pre_segment,@segments); &make_sections_rx;
-	local($within_preamble,$this_section) = 1 if ($PREAMBLE>1);
+	# $PARTITION_PAST_PREAMBLE: set by write_string_out once a partition
+	# containing \begin{document} has been processed (see there).
+	local($within_preamble,$this_section) = 1
+	    if ($PREAMBLE>1 && !$PARTITION_PAST_PREAMBLE);
 	while (/$sections_rx/) {
 	    $pre_segment .= $`; $_ = $'; $this_section = $&;
 	    do {
@@ -5345,7 +5361,8 @@ sub substitute_meta_cmds {
 	}
 	push(@segments,$pre_segment.$_);
 	local($replacements,$seg) ; $before = ''; # count the segments
-	local($within_preamble) = 1 if ($PREAMBLE>1);
+	local($within_preamble) = 1
+	    if ($PREAMBLE>1 && !$PARTITION_PAST_PREAMBLE);
 	foreach $after (@segments) {
 	  while ($after =~ /(\\(expandafter|noexpand)\b\s*)?$new_cmd_no_delim_rx\b\s?/) {
 	    ($before, $xafter, $cmd, $after) = ($`, $2, $3, $');
